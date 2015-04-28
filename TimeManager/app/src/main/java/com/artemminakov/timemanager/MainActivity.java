@@ -5,6 +5,7 @@ import java.util.Locale;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -20,7 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -59,6 +60,18 @@ public class MainActivity extends Activity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private String[] mItemTitles;
+
+
+    FrameLayout container;
+    FragmentManager myFragmentManager;
+    MainFragment fragmentMain;
+    TodayFragment todayFragment;
+    CalendarFragment calendarFragment;
+    TasksFragment tasksFragment;
+    StatisticsFragment statisticsFragment;
+    final static String TAG_1 = "FRAGMENT_1";
+    final static String KEY_MSG_1 = "FRAGMENT1_MSG";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,11 +173,10 @@ public class MainActivity extends Activity {
 
     private void selectItem(int position) {
         // update the main content by replacing fragments
-        Fragment fragment = new ManagerFragment();
+        Fragment fragment = new ItemFragment();
         Bundle args = new Bundle();
-        args.putInt(ManagerFragment.ARG_ITEM_NUMBER, position);
+        args.putInt(ItemFragment.ARG_ITEM_NUMBER, position);
         fragment.setArguments(args);
-
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
@@ -202,23 +214,45 @@ public class MainActivity extends Activity {
     /**
      * Fragment that appears in the "content_frame", shows a planet
      */
-    public static class ManagerFragment extends Fragment {
+    public static class ItemFragment extends Fragment {
         public static final String ARG_ITEM_NUMBER = "item_number";
 
-        public ManagerFragment() {
+        public ItemFragment() {
             // Empty constructor required for fragment subclasses
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_item, container, false);
             int i = getArguments().getInt(ARG_ITEM_NUMBER);
             String item = getResources().getStringArray(R.array.items_array)[i];
-
+            View rootView = null;
             int itemId = getResources().getIdentifier(item.toLowerCase(Locale.getDefault()),
                     "drawable", getActivity().getPackageName());
-            ((ImageView) rootView.findViewById(R.id.image)).setImageResource(itemId);
+
+            switch (i){
+                case 0:
+                    rootView = inflater.inflate(R.layout.main_fragment, container, false);
+                    break;
+                case 1:
+                    rootView = inflater.inflate(R.layout.today_fragment, container, false);
+                    break;
+                case 2:
+                    rootView = inflater.inflate(R.layout.calendar_fragment, container, false);
+                    break;
+                case 3:
+                    rootView = inflater.inflate(R.layout.tasks_fragment, container, false);
+                    break;
+                case 4:
+                    rootView = inflater.inflate(R.layout.statistics_fragment, container, false);
+                    break;
+                default:
+                    rootView = inflater.inflate(R.layout.main_fragment, container, false);
+                    break;
+            }
+
+
+
             getActivity().setTitle(item);
             return rootView;
         }
