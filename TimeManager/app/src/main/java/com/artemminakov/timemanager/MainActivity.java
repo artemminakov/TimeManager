@@ -1,5 +1,7 @@
 package com.artemminakov.timemanager;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -10,7 +12,9 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
@@ -21,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -52,7 +57,7 @@ import android.widget.Toast;
  * An action should be an operation performed on the current contents of the window,
  * for example enabling or disabling a data overlay on top of the current content.</p>
  */
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -62,13 +67,13 @@ public class MainActivity extends Activity {
     private String[] mItemTitles;
 
 
-    FrameLayout container;
-    FragmentManager myFragmentManager;
-    MainFragment fragmentMain;
-    TodayFragment todayFragment;
-    CalendarFragment calendarFragment;
-    TasksFragment tasksFragment;
-    StatisticsFragment statisticsFragment;
+    public FrameLayout container;
+    public MainFragment fragmentMain;
+    public TodayFragment todayFragment;
+    public CalendarFragment calendarFragment;
+    public TasksFragment tasksFragment;
+    public StatisticsFragment statisticsFragment;
+    public FragmentManager myFragmentManager;
     final static String TAG_1 = "FRAGMENT_1";
     final static String KEY_MSG_1 = "FRAGMENT1_MSG";
 
@@ -173,14 +178,49 @@ public class MainActivity extends Activity {
 
     private void selectItem(int position) {
         // update the main content by replacing fragments
+
         Fragment fragment = new ItemFragment();
         Bundle args = new Bundle();
         args.putInt(ItemFragment.ARG_ITEM_NUMBER, position);
         fragment.setArguments(args);
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        /*String item = getResources().getStringArray(R.array.items_array)[position];
+        switch (position){
+            case 0:
+                MainFragment mainFragment = (MainFragment) myFragmentManager
+                        .findFragmentByTag(TAG_1);
+                FragmentTransaction fragmentTransaction = myFragmentManager
+                        .beginTransaction();
+                fragmentTransaction.replace(R.id.content_frame, mainFragment,
+                        TAG_1);
+                fragmentTransaction.commit();
+                break;
+            case 1:
+                rootView = inflater.inflate(R.layout.today_fragment, container, false);
+                break;
+            case 2:
+                rootView = inflater.inflate(R.layout.calendar_fragment, container, false);
+                break;
+            case 3:
+                rootView = inflater.inflate(R.layout.tasks_fragment, container, false);
+                break;
+            case 4:
+                rootView = inflater.inflate(R.layout.statistics_fragment, container, false);
+                break;
+            default:
+                MainFragment mainFragment = (MainFragment) myFragmentManager
+                        .findFragmentByTag(TAG_1);
+                FragmentTransaction fragmentTransaction = myFragmentManager
+                        .beginTransaction();
+                fragmentTransaction.replace(R.id.content_frame, mainFragment,
+                        TAG_1);
+                fragmentTransaction.commit();
+                break;
+        }*/
 
         // update selected item and title, then close the drawer
+
         mDrawerList.setItemChecked(position, true);
         setTitle(mItemTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
@@ -224,18 +264,42 @@ public class MainActivity extends Activity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+            FragmentManager myFragmentManager;
             int i = getArguments().getInt(ARG_ITEM_NUMBER);
             String item = getResources().getStringArray(R.array.items_array)[i];
             View rootView = null;
             int itemId = getResources().getIdentifier(item.toLowerCase(Locale.getDefault()),
                     "drawable", getActivity().getPackageName());
 
+            myFragmentManager = getFragmentManager();
+            Fragment fra = new TodayFragment();
+            Fragment fragment = (TodayFragment) myFragmentManager
+                    .findFragmentByTag(TAG_1);
+            FragmentTransaction fragmentTransaction;
+
+
             switch (i){
                 case 0:
                     rootView = inflater.inflate(R.layout.main_fragment, container, false);
+                    fra = new MainFragment();
+                    fragment = (MainFragment) myFragmentManager
+                            .findFragmentByTag(TAG_1);
+                    fragmentTransaction = myFragmentManager
+                            .beginTransaction();
+                    fragmentTransaction.replace(R.id.content_frame, fra,
+                            TAG_1);
+                    fragmentTransaction.commit();
                     break;
                 case 1:
                     rootView = inflater.inflate(R.layout.today_fragment, container, false);
+                    fra = new TodayFragment();
+                    fragment = (TodayFragment) myFragmentManager
+                            .findFragmentByTag(TAG_1);
+                    fragmentTransaction = myFragmentManager
+                            .beginTransaction();
+                    fragmentTransaction.replace(R.id.content_frame, fra,
+                            TAG_1);
+                    fragmentTransaction.commit();
                     break;
                 case 2:
                     rootView = inflater.inflate(R.layout.calendar_fragment, container, false);
