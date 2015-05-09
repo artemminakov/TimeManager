@@ -9,8 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/calendarView"
-        android:layout_below="@+id/imageView2"
-        android:layout_toRightOf="@+id/imageView2"
+        android:layout_below="@+id/imageViewMainFragment"
+        android:layout_toRightOf="@+id/imageViewMainFragment"
         android:selectedWeekBackgroundColor="#ff1135ff"
         android:weekNumberColor="#ff5c5960"
         android:weekSeparatorLineColor="#ff5c5960" />

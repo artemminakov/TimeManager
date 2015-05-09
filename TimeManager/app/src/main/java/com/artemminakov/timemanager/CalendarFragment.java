@@ -7,15 +7,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-/**
- * Created by artem on 28.04.15.
- */
-public class CalendarFragment extends Fragment{
+
+public class CalendarFragment extends Fragment {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.main_fragment, null);
+        View view = inflater.inflate(R.layout.calendar_fragment, null);
 
         return view;
     }

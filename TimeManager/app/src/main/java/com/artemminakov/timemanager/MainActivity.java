@@ -66,16 +66,13 @@ public class MainActivity extends FragmentActivity {
     private CharSequence mTitle;
     private String[] mItemTitles;
 
-
-    public FrameLayout container;
-    public MainFragment fragmentMain;
-    public TodayFragment todayFragment;
-    public CalendarFragment calendarFragment;
-    public TasksFragment tasksFragment;
-    public StatisticsFragment statisticsFragment;
-    public FragmentManager myFragmentManager;
+    static public MainFragment fragmentMain;
+    static public TodayFragment todayFragment;
+    static public CalendarFragment calendarFragment;
+    static public TasksFragment tasksFragment;
+    static public StatisticsFragment statisticsFragment;
+    static public FragmentManager myFragmentManager;
     final static String TAG_1 = "FRAGMENT_1";
-    final static String KEY_MSG_1 = "FRAGMENT1_MSG";
 
 
     @Override
@@ -87,6 +84,12 @@ public class MainActivity extends FragmentActivity {
         mItemTitles = getResources().getStringArray(R.array.items_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        myFragmentManager = getFragmentManager();
+        fragmentMain = new MainFragment();
+        todayFragment = new TodayFragment();
+        calendarFragment = new CalendarFragment();
+        tasksFragment = new TasksFragment();
+        statisticsFragment = new StatisticsFragment();
 
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
@@ -151,7 +154,7 @@ public class MainActivity extends FragmentActivity {
             return true;
         }
         // Handle action buttons
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.action_websearch:
                 // create intent to perform web search for this planet
                 Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
@@ -185,39 +188,7 @@ public class MainActivity extends FragmentActivity {
         fragment.setArguments(args);
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-        /*String item = getResources().getStringArray(R.array.items_array)[position];
-        switch (position){
-            case 0:
-                MainFragment mainFragment = (MainFragment) myFragmentManager
-                        .findFragmentByTag(TAG_1);
-                FragmentTransaction fragmentTransaction = myFragmentManager
-                        .beginTransaction();
-                fragmentTransaction.replace(R.id.content_frame, mainFragment,
-                        TAG_1);
-                fragmentTransaction.commit();
-                break;
-            case 1:
-                rootView = inflater.inflate(R.layout.today_fragment, container, false);
-                break;
-            case 2:
-                rootView = inflater.inflate(R.layout.calendar_fragment, container, false);
-                break;
-            case 3:
-                rootView = inflater.inflate(R.layout.tasks_fragment, container, false);
-                break;
-            case 4:
-                rootView = inflater.inflate(R.layout.statistics_fragment, container, false);
-                break;
-            default:
-                MainFragment mainFragment = (MainFragment) myFragmentManager
-                        .findFragmentByTag(TAG_1);
-                FragmentTransaction fragmentTransaction = myFragmentManager
-                        .beginTransaction();
-                fragmentTransaction.replace(R.id.content_frame, mainFragment,
-                        TAG_1);
-                fragmentTransaction.commit();
-                break;
-        }*/
+
 
         // update selected item and title, then close the drawer
 
@@ -264,57 +235,58 @@ public class MainActivity extends FragmentActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            FragmentManager myFragmentManager;
             int i = getArguments().getInt(ARG_ITEM_NUMBER);
             String item = getResources().getStringArray(R.array.items_array)[i];
             View rootView = null;
             int itemId = getResources().getIdentifier(item.toLowerCase(Locale.getDefault()),
                     "drawable", getActivity().getPackageName());
-
-            myFragmentManager = getFragmentManager();
-            Fragment fra = new TodayFragment();
-            Fragment fragment = (TodayFragment) myFragmentManager
-                    .findFragmentByTag(TAG_1);
             FragmentTransaction fragmentTransaction;
 
 
-            switch (i){
+            switch (i) {
                 case 0:
-                    rootView = inflater.inflate(R.layout.main_fragment, container, false);
-                    fra = new MainFragment();
-                    fragment = (MainFragment) myFragmentManager
-                            .findFragmentByTag(TAG_1);
                     fragmentTransaction = myFragmentManager
                             .beginTransaction();
-                    fragmentTransaction.replace(R.id.content_frame, fra,
+                    fragmentTransaction.replace(R.id.content_frame, fragmentMain,
                             TAG_1);
                     fragmentTransaction.commit();
                     break;
                 case 1:
-                    rootView = inflater.inflate(R.layout.today_fragment, container, false);
-                    fra = new TodayFragment();
-                    fragment = (TodayFragment) myFragmentManager
-                            .findFragmentByTag(TAG_1);
                     fragmentTransaction = myFragmentManager
                             .beginTransaction();
-                    fragmentTransaction.replace(R.id.content_frame, fra,
+                    fragmentTransaction.replace(R.id.content_frame, todayFragment,
                             TAG_1);
                     fragmentTransaction.commit();
                     break;
                 case 2:
-                    rootView = inflater.inflate(R.layout.calendar_fragment, container, false);
+                    fragmentTransaction = myFragmentManager
+                            .beginTransaction();
+                    fragmentTransaction.replace(R.id.content_frame, calendarFragment,
+                            TAG_1);
+                    fragmentTransaction.commit();
                     break;
                 case 3:
-                    rootView = inflater.inflate(R.layout.tasks_fragment, container, false);
+                    fragmentTransaction = myFragmentManager
+                            .beginTransaction();
+                    fragmentTransaction.replace(R.id.content_frame, tasksFragment,
+                            TAG_1);
+                    fragmentTransaction.commit();
                     break;
                 case 4:
-                    rootView = inflater.inflate(R.layout.statistics_fragment, container, false);
+                    fragmentTransaction = myFragmentManager
+                            .beginTransaction();
+                    fragmentTransaction.replace(R.id.content_frame, statisticsFragment,
+                            TAG_1);
+                    fragmentTransaction.commit();
                     break;
                 default:
-                    rootView = inflater.inflate(R.layout.main_fragment, container, false);
+                    fragmentTransaction = myFragmentManager
+                            .beginTransaction();
+                    fragmentTransaction.replace(R.id.content_frame, fragmentMain,
+                            TAG_1);
+                    fragmentTransaction.commit();
                     break;
             }
-
 
 
             getActivity().setTitle(item);
