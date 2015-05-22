@@ -20,7 +20,7 @@ public class TaskLab {
             Task task = new Task();
             task.setTitle("Task №" + (i+1));
             task.setNumberOfHoursToSolve(i);
-            task.setPriority(i);
+            task.setPriority("Обычный");
             task.setIsSolved(i % 2 == 0);
             mTasks.add(task);
         }

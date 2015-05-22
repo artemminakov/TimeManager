@@ -11,6 +11,12 @@
         <item>Задачи</item>
         <item>Статистика</item>
     </string-array>
+    <string-array name="items_priority">
+        <item>Обычный</item>
+        <item>Средний</item>
+        <item>Высокий</item>
+        <item>Повышенный</item>
+    </string-array>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="new_task">New Task</string>
     <string name="drawer_close">Close navigation drawer</string>

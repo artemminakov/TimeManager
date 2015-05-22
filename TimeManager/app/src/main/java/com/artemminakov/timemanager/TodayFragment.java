@@ -37,6 +37,8 @@ public class TodayFragment extends Fragment {
             titleTextView.setText(task.getTitle());
             CheckBox solvedCheckBox = (CheckBox)convertView.findViewById(R.id.today_task_list_item_solvedCheckBox);
             solvedCheckBox.setChecked(task.isSolved());
+            TextView timeTextView = (TextView)convertView.findViewById(R.id.today_task_list_item_timeTextView);
+            timeTextView.setText(task.getTaskTime(position));
 
 
             return convertView;

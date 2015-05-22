@@ -23,7 +23,7 @@ public class DayTimetable {
             Task task = new Task();
             task.setTitle("Task №" + (i+1));
             task.setNumberOfHoursToSolve(i);
-            task.setPriority(i);
+            task.setPriority("Обычный");
             task.setIsSolved(i % 1 == 0);
             mTasks.add(task);
         }

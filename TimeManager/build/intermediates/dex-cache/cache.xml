@@ -2,32 +2,32 @@
 <items version="2" >
 
     <item
-        jar="/home/artem/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/22.1.1/support-annotations-22.1.1.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="01d051a6bfb1218b1db2d3a5af0480ac2c25c42a">
-        <dex dex="/home/artem/NEW/Github/TimeManager/TimeManager/app/build/intermediates/pre-dexed/debug/support-annotations-22.1.1-88937452609d6d9b254897ebedcd983733eaec0f.jar" />
-    </item>
-    <item
-        jar="/home/artem/NEW/Github/TimeManager/TimeManager/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="c95ba8152923e4872e86a82cfcba9a51c0214328">
-        <dex dex="/home/artem/NEW/Github/TimeManager/TimeManager/app/build/intermediates/pre-dexed/debug/classes-d160d44bc22e4d8c46c3570e90c1fadaf6a9bf95.jar" />
-    </item>
-    <item
-        jar="/home/artem/NEW/Github/TimeManager/TimeManager/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/libs/internal_impl-22.1.1.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="9e070ad32b2700b0343e8e0cccc437733d91ba3a">
-        <dex dex="/home/artem/NEW/Github/TimeManager/TimeManager/app/build/intermediates/pre-dexed/debug/internal_impl-22.1.1-1b28f19905e795e08445f68fc60ff28ed5b43c4c.jar" />
-    </item>
-    <item
-        jar="/home/artem/NEW/Github/TimeManager/TimeManager/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.1.1/classes.jar"
+        jar="/home/artem/Git/TimeManager/TimeManager/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.1.1/classes.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="a3ff3c506644c820eb2bdf06e8339f72be578551">
-        <dex dex="/home/artem/NEW/Github/TimeManager/TimeManager/app/build/intermediates/pre-dexed/debug/classes-551ca666c919a1de00b889291f768fe243debc69.jar" />
+        <dex dex="/home/artem/Git/TimeManager/TimeManager/app/build/intermediates/pre-dexed/debug/classes-84775f640e042bc0c7f7b3839ecedfb26b2bf0d4.jar" />
+    </item>
+    <item
+        jar="/home/artem/android-sdk-linux/extras/android/m2repository/com/android/support/support-annotations/22.1.1/support-annotations-22.1.1.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="01d051a6bfb1218b1db2d3a5af0480ac2c25c42a">
+        <dex dex="/home/artem/Git/TimeManager/TimeManager/app/build/intermediates/pre-dexed/debug/support-annotations-22.1.1-b4df08e34b30c6243bcf98825fc578ddf9f7a0b1.jar" />
+    </item>
+    <item
+        jar="/home/artem/Git/TimeManager/TimeManager/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/libs/internal_impl-22.1.1.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="9e070ad32b2700b0343e8e0cccc437733d91ba3a">
+        <dex dex="/home/artem/Git/TimeManager/TimeManager/app/build/intermediates/pre-dexed/debug/internal_impl-22.1.1-efef09064ad6708bd54cf21c1c42cb159461eadc.jar" />
+    </item>
+    <item
+        jar="/home/artem/Git/TimeManager/TimeManager/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="c95ba8152923e4872e86a82cfcba9a51c0214328">
+        <dex dex="/home/artem/Git/TimeManager/TimeManager/app/build/intermediates/pre-dexed/debug/classes-8a99d34b69cdc3eae6d7231e2bcde133fe8212db.jar" />
     </item>
 
 </items>
