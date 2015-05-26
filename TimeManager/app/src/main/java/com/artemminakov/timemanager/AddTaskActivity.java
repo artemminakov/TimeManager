@@ -14,10 +14,10 @@ public class AddTaskActivity extends Activity{
 
     private String[] priority = {"Обычный", "Средний", "Высокий", "Повышенный"};
 
-    String taskTitleName = "title";
-    String taskQuantityHoursName = "quantity";
-    String taskPriorityName = "priority";
-    String taskPriority;
+    private String taskTitleName = "title";
+    private String taskQuantityHoursName = "quantity";
+    private String taskPriorityName = "priority";
+    private String taskPriority;
 
 
     @Override

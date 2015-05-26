@@ -66,13 +66,13 @@ public class MainActivity extends FragmentActivity {
     private CharSequence mTitle;
     private String[] mItemTitles;
 
-    static public MainFragment fragmentMain;
-    static public TodayFragment todayFragment;
-    static public CalendarFragment calendarFragment;
-    static public TasksFragment tasksFragment;
-    static public StatisticsFragment statisticsFragment;
-    static public FragmentManager myFragmentManager;
-    final static String TAG_1 = "FRAGMENT_1";
+    private static MainFragment fragmentMain;
+    private static TodayFragment todayFragment;
+    private static CalendarFragment calendarFragment;
+    private static TasksFragment tasksFragment;
+    private static StatisticsFragment statisticsFragment;
+    private static FragmentManager myFragmentManager;
+    private static final String TAG_1 = "FRAGMENT";
 
 
     @Override

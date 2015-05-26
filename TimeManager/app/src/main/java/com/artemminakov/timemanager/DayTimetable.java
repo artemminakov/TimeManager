@@ -14,23 +14,23 @@ public class DayTimetable {
     private Context mAppContext;
     private Date mDate;
 
-    private DayTimetable(Context appContext){
+    private DayTimetable(Context appContext) {
         mAppContext = appContext;
         mTasks = new ArrayList<Task>();
         mDate = new Date();
 
-        for (int i =0; i < 10; i++){
+        /*for (int i = 0; i < 15; i++) {
             Task task = new Task();
-            task.setTitle("Task №" + (i+1));
+            task.setTitle("Task №" + (i + 1));
             task.setNumberOfHoursToSolve(i);
             task.setPriority("Обычный");
-            task.setIsSolved(i % 1 == 0);
+            task.setIsSolved(false);
             mTasks.add(task);
-        }
+        }*/
     }
 
-    public static DayTimetable get(Context c){
-        if(sDayTimetable == null){
+    public static DayTimetable get(Context c) {
+        if (sDayTimetable == null) {
             sDayTimetable = new DayTimetable(c.getApplicationContext());
         }
         return sDayTimetable;
@@ -40,9 +40,9 @@ public class DayTimetable {
         return mTasks;
     }
 
-    public Task getTask(UUID id){
-        for (Task t : mTasks){
-            if (t.getId().equals(id)){
+    public Task getTask(UUID id) {
+        for (Task t : mTasks) {
+            if (t.getId().equals(id)) {
                 return t;
             }
         }
@@ -55,5 +55,16 @@ public class DayTimetable {
 
     public void setDate(Date mDate) {
         this.mDate = mDate;
+    }
+
+    public void addTask(Task task) {
+        if (mTasks.size() > 14){
+            return;
+        }
+        mTasks.add(task);
+    }
+
+    public void clear(){
+        mTasks.clear();
     }
 }

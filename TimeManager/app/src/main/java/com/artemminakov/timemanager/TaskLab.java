@@ -1,6 +1,7 @@
 package com.artemminakov.timemanager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -12,22 +13,13 @@ public class TaskLab {
     private static TaskLab sTaskLab;
     private Context mAppContext;
 
-    private TaskLab(Context appContext){
+    private TaskLab(Context appContext) {
         mAppContext = appContext;
         mTasks = new ArrayList<Task>();
-
-        for (int i =0; i < 11; i++){
-            Task task = new Task();
-            task.setTitle("Task №" + (i+1));
-            task.setNumberOfHoursToSolve(i);
-            task.setPriority("Обычный");
-            task.setIsSolved(i % 2 == 0);
-            mTasks.add(task);
-        }
     }
 
-    public static TaskLab get(Context c){
-        if(sTaskLab == null){
+    public static TaskLab get(Context c) {
+        if (sTaskLab == null) {
             sTaskLab = new TaskLab(c.getApplicationContext());
         }
         return sTaskLab;
@@ -37,16 +29,20 @@ public class TaskLab {
         return mTasks;
     }
 
-    public Task getTask(UUID id){
-        for (Task t : mTasks){
-            if (t.getId().equals(id)){
+    public Task getTask(UUID id) {
+        for (Task t : mTasks) {
+            if (t.getId().equals(id)) {
                 return t;
             }
         }
         return null;
     }
 
-    public void addTask(Task task){
+    public void addTask(Task task) {
         mTasks.add(task);
+    }
+
+    public void clear() {
+        mTasks.clear();
     }
 }

@@ -5,7 +5,8 @@ import java.util.UUID;
 
 public class Task {
 
-    private String[] taskTime = {"  8:00", "10:00", "12:00", "14:00", "16:00", "18:00", "19:00", "20:00", "21:00", "22:00"};
+    private static String[] taskTime = {"  8:00", "  9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00",
+            "18:00", "19:00", "20:00", "21:00", "22:00", "18:00", "19:00", "20:00", "21:00", "22:00", "18:00", "19:00", "20:00", "21:00", "22:00"};
 
     private UUID mId;
     private String mTitle;
@@ -29,8 +30,8 @@ public class Task {
         mIsSolved = isSolved;
     }
 
-    public UUID getId() {
-        return mId;
+    public String getId() {
+        return mId.toString();
     }
 
     public String getTitle() {
@@ -66,11 +67,11 @@ public class Task {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return mTitle;
     }
 
-    public String getTaskTime(int position){
+    public String getTaskTime(int position) {
         return taskTime[position];
     }
 
