@@ -1,6 +1,8 @@
 package com.artemminakov.timemanager;
 
 import android.app.Fragment;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -8,19 +10,35 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class TodayFragment extends Fragment {
 
     private ArrayList<Task> mTasks;
+    TaskDatabaseHelper taskDBHelper;
 
-    final String LOG_TAG = "myLogs";
+    private static final String COLUMN_TASK_TITLE = "title";
+    private static final String COLUMN_TASK_PRIORITY = "priority";
+    private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
+    private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
+
+    private static final String taskTitle = "title";
+    private static final String taskPriority = "priority";
+    private static final String taskQuantityHours = "quantityHours";
+    private static final String taskIsSolved = "isSolved";
+
+    private DateFormat df = new SimpleDateFormat("dd.M.yyyy");
+    private Date currDate = new Date();
 
     public class TaskAdapter extends ArrayAdapter<Task>{
         public TaskAdapter(ArrayList<Task> tasks){
@@ -58,44 +76,90 @@ public class TodayFragment extends Fragment {
 
 
         View view = inflater.inflate(R.layout.today_fragment, null);
-        ListView lvMain = (ListView) view.findViewById(R.id.listViewSchedule);
+        final ListView lvMain = (ListView) view.findViewById(R.id.listViewSchedule);
         mTasks = DayTimetable.get(getActivity()).getTasks();
+        queryTaskDBHelper(df.format(currDate));
 
         TaskAdapter adapter = new TaskAdapter(mTasks);
 
         lvMain.setAdapter(adapter);
 
+        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(getActivity().getApplicationContext(), EditTaskActivity.class);
+                Task task = (Task)lvMain.getItemAtPosition(position);
+                i.putExtra(taskTitle, task.getTitle());
+                i.putExtra(taskPriority, task.getPriority());
+                i.putExtra(taskQuantityHours, Integer.toString(task.getNumberOfHoursToSolve()));
+                i.putExtra(taskIsSolved, (task.isSolved()? 1 : 0));
+                startActivity(i);
+            }
+        });
+
         return view;
     }
 
-    /*private void queryDBHelper(){
-        dbHelper = new DBHelper(getActivity().getApplicationContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Log.d(LOG_TAG, "--- Rows in mytable: ---");
-        // делаем запрос всех данных из таблицы mytable, получаем Cursor
-        Cursor c = db.query("mytable", null, null, null, null, null, null);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        DayTimetable.get(getActivity()).clear();
+    }
 
-        // ставим позицию курсора на первую строку выборки
-        // если в выборке нет строк, вернется false
-        if (c.moveToFirst()) {
 
-            // определяем номера столбцов по имени в выборке
-            int idColIndex = c.getColumnIndex("id");
-            int nameColIndex = c.getColumnIndex("name");
-            int emailColIndex = c.getColumnIndex("email");
+    @Override
+    public void onPause() {
+        super.onPause();
+        DayTimetable.get(getActivity()).clear();
+    }
 
-            do {
-                // получаем значения по номерам столбцов и пишем все в лог
-                Log.d(LOG_TAG,
-                        "ID = " + c.getInt(idColIndex) +
-                                ", name = " + c.getString(nameColIndex) +
-                                ", email = " + c.getString(emailColIndex));
-                // переход на следующую строку
-                // а если следующей нет (текущая - последняя), то false - выходим из цикла
-            } while (c.moveToNext());
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        queryTaskDBHelper(df.format(currDate));
+        ListView listView = (ListView) this.getActivity().findViewById(R.id.listViewSchedule);
+        TaskAdapter adapter = new TaskAdapter(mTasks);
+        listView.setAdapter(adapter);
+    }
+
+
+    private void queryTaskDBHelper(String date) {
+        taskDBHelper = new TaskDatabaseHelper(this.getActivity().getApplicationContext());
+        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
+
+        String sqlQuery = "select * from timetable where date = \"" + date + "\"";
+
+        Cursor c = db.rawQuery(sqlQuery, null);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                StringBuilder sb = new StringBuilder();
+                do {
+                    sb.setLength(0);
+                    for (String cn : c.getColumnNames()) {
+                        Cursor c1 = db.rawQuery("select * from task where idTask = \"" + c.getString(c.getColumnIndex(cn)) + "\"", null);
+                        if (c1 != null) {
+                            if (c1.moveToFirst()) {
+                                int titleColIndex = c1.getColumnIndex(COLUMN_TASK_TITLE);
+                                int priorityColIndex = c1.getColumnIndex(COLUMN_TASK_PRIORITY);
+                                int quantityHColIndex = c1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
+                                int isSolvedColIndex = c1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
+                                Task resTask = new Task();
+                                resTask.setTitle(c1.getString(titleColIndex));
+                                resTask.setPriority(c1.getString(priorityColIndex));
+                                resTask.setNumberOfHoursToSolve(c1.getInt(quantityHColIndex));
+                                resTask.setIsSolved((c1.getInt(isSolvedColIndex) != 0));
+                                DayTimetable.get(this.getActivity().getApplicationContext()).addTask(resTask);
+                            }
+                        }
+                        c1.close();
+                    }
+                } while (c.moveToNext());
+            }
         } else
-            Log.d(LOG_TAG, "0 rows");
+
         c.close();
-    }*/
+    }
+
 }

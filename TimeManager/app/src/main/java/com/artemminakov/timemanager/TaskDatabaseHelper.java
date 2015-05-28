@@ -3,11 +3,8 @@ package com.artemminakov.timemanager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class TaskDatabaseHelper extends SQLiteOpenHelper {
-
-    private static final String LOG_TAG = "myLogs";
 
     private static final String DB_NAME = "timtmanager.sqlite";
     private static final int VERSION = 1;
@@ -18,7 +15,7 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d(LOG_TAG, "--- onCreate database ---");
+
         db.execSQL("create table task (idTask integer primary key autoincrement, title text, priority text, " +
                 "quantityHours integer, isSolved integer);");
 

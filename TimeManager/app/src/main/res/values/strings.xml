@@ -23,4 +23,7 @@
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
 
+    <string name="current_task">Текущие:</string>
+    <string name="execute_task">Выполненые:</string>
+    <string name="overdue_task">Просроченые:</string>
 </resources>

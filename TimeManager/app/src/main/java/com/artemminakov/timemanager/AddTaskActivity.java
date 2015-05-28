@@ -23,7 +23,7 @@ public class AddTaskActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.add_task_activity);
         Button addButton = (Button)findViewById(R.id.add_btn_task_AddTaskActivity);
         final EditText titleEditText = (EditText)findViewById(R.id.title_AddTaskActivity);

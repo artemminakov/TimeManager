@@ -19,7 +19,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -29,7 +28,6 @@ public class TasksFragment extends Fragment {
     private String taskPriority;
     private int taskQuantityHours;
 
-    final String LOG_TAG = "myLogs";
     private static final String TABLE_TASK = "task";
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
@@ -97,9 +95,7 @@ public class TasksFragment extends Fragment {
         lvMain.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Task task = (Task) lvMain.getItemAtPosition(position);
-                Toast.makeText(getActivity().getApplicationContext(), task.getTitle() + " was clicked", Toast.LENGTH_LONG).show();
-                Intent i = new Intent(getActivity().getApplicationContext(), AddTaskActivity.class);
+                Intent i = new Intent(getActivity().getApplicationContext(), EditTaskActivity.class);
                 startActivity(i);
             }
         });

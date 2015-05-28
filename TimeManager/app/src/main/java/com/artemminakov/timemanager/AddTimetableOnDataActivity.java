@@ -7,12 +7,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
@@ -36,7 +36,6 @@ public class AddTimetableOnDataActivity extends Activity {
     private ArrayList<Task> mTasks;
     TaskDatabaseHelper taskDBHelper;
 
-    final String LOG_TAG = "myLogs";
 
     private static final String TABLE_TIMETABLE = "timetable";
     private static final String COLUMN_TIMETABLE_DATE = "date";
@@ -119,6 +118,14 @@ public class AddTimetableOnDataActivity extends Activity {
 
         lvMain.setAdapter(adapter);
 
+        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(getApplicationContext(), EditTaskActivity.class);
+                startActivity(i);
+            }
+        });
+
     }
 
     @Override
@@ -152,11 +159,8 @@ public class AddTimetableOnDataActivity extends Activity {
         String sqlQuery = "select * from timetable where date = \"" + date + "\"";
 
         Cursor c = db.rawQuery(sqlQuery, null);
-        Log.d(LOG_TAG, ". Cursor is null before");
         if (c != null) {
-            Log.d(LOG_TAG, ". Cursor is null after");
             if (c.moveToFirst()) {
-                Log.d(LOG_TAG, ". " + c.getCount() + " rows");
                 StringBuilder sb = new StringBuilder();
                 do {
                     sb.setLength(0);
@@ -177,14 +181,10 @@ public class AddTimetableOnDataActivity extends Activity {
                             }
                         }
                         c1.close();
-                        sb.append(cn + " = "
-                                + c.getString(c.getColumnIndex(cn)) + "; ");
                     }
-                    Log.d(LOG_TAG, sb.toString());
                 } while (c.moveToNext());
             }
         } else
-            Log.d(LOG_TAG, ". Cursor is null");
 
         c.close();
     }

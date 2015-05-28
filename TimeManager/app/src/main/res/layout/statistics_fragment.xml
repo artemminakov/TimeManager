@@ -14,5 +14,72 @@
         android:layout_gravity="center_horizontal"
         android:layout_centerHorizontal="true"/>
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="date"
+        android:ems="10"
+        android:id="@+id/editText"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="10pt"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/current_task"
+        android:id="@+id/textViewStatisticsFragmentCurrentTasks"
+        android:paddingTop="15pt"
+        android:textSize="25dp"
+        android:paddingLeft="15dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/textViewStatisticsFragmentCurrentTasksCount"
+        android:textSize="25dp"
+        android:paddingLeft="130dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/execute_task"
+        android:id="@+id/textViewStatisticsFragmentExecutionTasks"
+        android:paddingTop="15pt"
+        android:textSize="25dp"
+        android:paddingLeft="15dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text=""
+        android:id="@+id/textViewStatisticsFragmentExecutionTasksCount"
+        android:textSize="25dp"
+        android:paddingLeft="130dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/overdue_task"
+        android:id="@+id/textViewStatisticsFragmentOverdueTasks"
+        android:paddingTop="15pt"
+        android:textSize="25dp"
+        android:paddingLeft="15dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/textViewStatisticsFragmentOverdueTasksCount"
+        android:textSize="25dp"
+        android:paddingLeft="130dp" />
+
 
 </LinearLayout>
