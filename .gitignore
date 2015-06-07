@@ -1,2 +1,4 @@
-TimeManager/**/*.bin
-
+.idea
+.gradle
+/build
+*.iml
