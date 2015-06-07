@@ -6,13 +6,14 @@ import java.util.UUID;
 public class Task {
 
     private static String[] taskTime = {"  8:00", "  9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00",
-            "18:00", "19:00", "20:00", "21:00", "22:00", "18:00", "19:00", "20:00", "21:00", "22:00", "18:00", "19:00", "20:00", "21:00", "22:00"};
+            "18:00", "19:00", "20:00", "21:00", "22:00"};
 
     private UUID mId;
     private String mTitle;
     private String mPriority;
     private int mNumberOfHoursToSolve;
     private boolean mIsSolved;
+    private int mSpentOnSolution;
 
     public Task() {
         mId = UUID.randomUUID();
@@ -20,6 +21,7 @@ public class Task {
         mPriority = "Обычный";
         mNumberOfHoursToSolve = 0;
         mIsSolved = false;
+        mSpentOnSolution = 0;
     }
 
     public Task(String title, String priority, int quantityHours, boolean isSolved) {
@@ -28,6 +30,7 @@ public class Task {
         mPriority = priority;
         mNumberOfHoursToSolve = quantityHours;
         mIsSolved = isSolved;
+        mSpentOnSolution = 0;
     }
 
     public String getId() {
@@ -73,6 +76,14 @@ public class Task {
 
     public String getTaskTime(int position) {
         return taskTime[position];
+    }
+
+    public void setSpentOnSolution(int spentOnSolution){
+        mSpentOnSolution = spentOnSolution;
+    }
+
+    public int getSpentOnSolution(){
+        return mSpentOnSolution;
     }
 
 }

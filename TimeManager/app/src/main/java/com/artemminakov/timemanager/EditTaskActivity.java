@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -33,6 +34,7 @@ public class EditTaskActivity extends Activity {
     private String extraPriority;
     private int selectonPrioritySpinner = 1;
     private String taskPriority;
+    private boolean isSolvedTask = false;
 
     private TaskDatabaseHelper taskDBHelper;
 
@@ -40,15 +42,16 @@ public class EditTaskActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        setContentView(R.layout.add_task_activity);
-        Button editButton = (Button) findViewById(R.id.add_btn_task_AddTaskActivity);
-        editButton.setText("Редактировать");
-        final EditText titleEditText = (EditText) findViewById(R.id.title_AddTaskActivity);
+        setContentView(R.layout.edit_task_activity);
+        Button editButton = (Button) findViewById(R.id.edit_btn_task_EditTaskActivity);
+        final EditText titleEditText = (EditText) findViewById(R.id.title_EditTaskActivity);
         titleEditText.setText(getIntent().getStringExtra(taskTitleName));
-        final EditText quantityHoursEditText = (EditText) findViewById(R.id.quantH_editText_AddTaskActivity);
+        final EditText quantityHoursEditText = (EditText) findViewById(R.id.quantH_editText_EditTaskActivity);
         extraPriority = getIntent().getStringExtra(taskPriorityName);
         quantityHoursEditText.setText(getIntent().getStringExtra(taskQuantityHoursName));
-        Spinner prioritySpinner = (Spinner) findViewById(R.id.spinner_AddTaskActivity);
+        final CheckBox checkBoxSolve = (CheckBox) findViewById(R.id.checkBox_EditTaskActivity);
+        checkBoxSolve.setChecked((getIntent().getIntExtra(taskIsSolvedName, 1) != 0));
+        Spinner prioritySpinner = (Spinner) findViewById(R.id.spinner_EditTaskActivity);
         for (int i = 0; i < priority.length; i++) {
             if (priority[i].equals(extraPriority)) {
                 selectonPrioritySpinner = i;
@@ -70,13 +73,8 @@ public class EditTaskActivity extends Activity {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isSolvedTask = checkBoxSolve.isChecked();
                 editQueryTaskDBHelper(titleEditText.getText().toString(), taskPriority, quantityHoursEditText.getText().toString());
-                /*Intent intent = new Intent();
-                intent.putExtra(taskPriorityName, taskPriority);
-                intent.putExtra(taskTitleName, titleEditText.getText().toString());
-                intent.putExtra(taskQuantityHoursName, quantityHoursEditText.getText().toString());
-                intent.putExtra(taskIsSolved, )
-                setResult(RESULT_OK, intent);*/
                 finish();
             }
         });
@@ -110,7 +108,7 @@ public class EditTaskActivity extends Activity {
         cv.put(COLUMN_TASK_TITLE, titleTask);
         cv.put(COLUMN_TASK_PRIORITY, priorityTask);
         cv.put(COLUMN_TASK_QUANTITY_HOURS, Integer.parseInt(quantityHoursTask));
-        cv.put(COLUMN_TASK_IS_SOLVED, 1);
+        cv.put(COLUMN_TASK_IS_SOLVED, (isSolvedTask ? 1 : 0));
 
         db.update(TABLE_TASK, cv, "idTask = ?", new String[]{Integer.toString(editTaskId)});
 

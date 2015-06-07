@@ -13,20 +13,13 @@ public class DayTimetable {
     private static DayTimetable sDayTimetable;
     private Context mAppContext;
     private Date mDate;
+    private boolean solvedTasks[] = {false, false, true, false, false, true, false, false, true, false, false, true, false, false, true};
 
     private DayTimetable(Context appContext) {
         mAppContext = appContext;
         mTasks = new ArrayList<Task>();
         mDate = new Date();
 
-        /*for (int i = 0; i < 15; i++) {
-            Task task = new Task();
-            task.setTitle("Task №" + (i + 1));
-            task.setNumberOfHoursToSolve(i);
-            task.setPriority("Обычный");
-            task.setIsSolved(false);
-            mTasks.add(task);
-        }*/
     }
 
     public static DayTimetable get(Context c) {
@@ -51,6 +44,10 @@ public class DayTimetable {
 
     public Date getDate() {
         return mDate;
+    }
+
+    public boolean[] getSolvedTasks(){
+        return solvedTasks;
     }
 
     public void setDate(Date mDate) {

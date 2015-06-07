@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2a5686"
+    android:weightSum="1">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/title_EditTaskActivity"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"
+        android:hint="Название"
+        android:textColorHint="#5af0faff"
+        android:textColor="#fff"
+        android:singleLine="false"
+        android:background="@android:color/transparent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textSize="30dp" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#ff56718a"
+        android:id="@+id/view_EditTaskActivity"
+        android:layout_below="@+id/title_EditTaskActivity"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/items_priority"
+        android:id="@+id/spinner_EditTaskActivity"
+        android:background="@android:color/transparent"
+        android:layout_below="@+id/priority_textView_EditTaskActivity"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="11dp"/>
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/quantH_editText_EditTaskActivity"
+        android:background="@android:color/transparent"
+        android:hint="Кол-во часов"
+        android:layout_below="@+id/view_EditTaskActivity"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="20dp"
+        android:inputType="numberDecimal"
+        android:textColor="#fff"
+        android:textColorHint="#5af0faff" />
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#ff56718a"
+        android:id="@+id/view2_EditTaskActivity"
+        android:layout_below="@+id/quantH_editText_EditTaskActivity"
+        android:layout_alignRight="@+id/title_EditTaskActivity"
+        android:layout_alignEnd="@+id/title_EditTaskActivity"
+        android:layout_marginTop="5dp" />
+
+    <Button
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Редактировать"
+        android:id="@+id/edit_btn_task_EditTaskActivity"
+        android:background="#224469"
+        android:layout_marginBottom="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="#5af0faff"
+        android:clickable="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Приоритет"
+        android:id="@+id/priority_textView_EditTaskActivity"
+        android:textColor="#5af0faff"
+        android:textSize="20dp"
+        android:layout_below="@+id/view2_EditTaskActivity"
+        android:layout_alignLeft="@+id/quantH_editText_EditTaskActivity"
+        android:layout_alignStart="@+id/quantH_editText_EditTaskActivity"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Решено"
+        android:id="@+id/checkboxTitle_textView_EditTaskActivity"
+        android:textColor="#5af0faff"
+        android:textSize="20dp"
+        android:layout_below="@+id/spinner_EditTaskActivity"
+        android:layout_alignLeft="@+id/quantH_editText_EditTaskActivity"
+        android:layout_alignStart="@+id/quantH_editText_EditTaskActivity"
+        android:layout_marginTop="10dp" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkBox_EditTaskActivity"
+        android:layout_below="@+id/spinner_EditTaskActivity"
+        android:layout_alignLeft="@+id/checkboxTitle_textView_EditTaskActivity"
+        android:layout_marginLeft="75dp"
+        android:layout_marginTop="10dp"/>
+
+
+</RelativeLayout>

@@ -19,9 +19,9 @@ import java.util.Date;
 public class StatisticsFragment extends Fragment {
     final String LOG_TAG = "myLogs";
     private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
-    private static int countExecuteTask = 0;
-    private static int countOverdueTask = 0;
-    private static int countCurrentTask = 0;
+    private int countExecuteTask = 0;
+    private int countOverdueTask = 0;
+    private int countCurrentTask = 0;
 
     private DateFormat df = new SimpleDateFormat("dd.M.yyyy");
     private Date currDate = new Date();
@@ -54,9 +54,9 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        countCurrentTask = 0;
+        /*countCurrentTask = 0;
         countExecuteTask = 0;
-        countOverdueTask = 0;
+        countOverdueTask = 0;*/
     }
 
     private void queryTaskDBHelper(String date) {

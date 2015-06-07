@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +28,7 @@ public class TasksFragment extends Fragment {
     private String taskTitle;
     private String taskPriority;
     private int taskQuantityHours;
+    final String LOG_TAG = "myLogs";
 
     private static final String TABLE_TASK = "task";
     private static final String COLUMN_TASK_TITLE = "title";
@@ -84,18 +86,22 @@ public class TasksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Log.d(LOG_TAG, "TasksFragment:onCreateView");
         View view = inflater.inflate(R.layout.tasks_fragment, null);
         mTasks = TaskLab.get(getActivity()).getTasks();
         final ListView lvMain = (ListView) view.findViewById(R.id.listViewTasks);
-        TaskAdapter adapter = new TaskAdapter(mTasks);
         setHasOptionsMenu(true);
 
-        lvMain.setAdapter(adapter);
 
         lvMain.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(getActivity().getApplicationContext(), EditTaskActivity.class);
+                Task task = (Task)lvMain.getItemAtPosition(position);
+                i.putExtra(COLUMN_TASK_TITLE, task.getTitle());
+                i.putExtra(COLUMN_TASK_PRIORITY, task.getPriority());
+                i.putExtra(COLUMN_TASK_QUANTITY_HOURS, Integer.toString(task.getNumberOfHoursToSolve()));
+                i.putExtra(COLUMN_TASK_IS_SOLVED, (task.isSolved()? 1 : 0));
                 startActivity(i);
             }
         });
@@ -105,13 +111,15 @@ public class TasksFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "TasksFragment:onCreate");
         super.onCreate(savedInstanceState);
-        queryTaskDBHelper();
     }
 
     @Override
     public void onResume() {
+        Log.d(LOG_TAG, "TasksFragment:onResume");
         super.onResume();
+        queryTaskDBHelper();
         ListView listView = (ListView) this.getActivity().findViewById(R.id.listViewTasks);
         TaskAdapter adapter = new TaskAdapter(mTasks);
         listView.setAdapter(adapter);
@@ -132,7 +140,15 @@ public class TasksFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        Log.d(LOG_TAG, "TasksFragment:onDestroy");
         super.onDestroy();
+        TaskLab.get(getActivity()).clear();
+    }
+
+    @Override
+    public void onPause(){
+        Log.d(LOG_TAG, "TasksFragment:onPause");
+        super.onPause();
         TaskLab.get(getActivity()).clear();
     }
 

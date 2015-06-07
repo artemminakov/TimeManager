@@ -1,7 +1,6 @@
 package com.artemminakov.timemanager;
 
 import android.app.Fragment;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,7 +24,9 @@ import java.util.Date;
 public class TodayFragment extends Fragment {
 
     private ArrayList<Task> mTasks;
-    TaskDatabaseHelper taskDBHelper;
+    private TaskDatabaseHelper taskDBHelper;
+    private boolean[] tasksSolve;
+    final String LOG_TAG = "myLogs";
 
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
@@ -56,7 +57,7 @@ public class TodayFragment extends Fragment {
             TextView titleTextView = (TextView)convertView.findViewById(R.id.today_task_list_item_titleTextView);
             titleTextView.setText(task.getTitle());
             CheckBox solvedCheckBox = (CheckBox)convertView.findViewById(R.id.today_task_list_item_solvedCheckBox);
-            solvedCheckBox.setChecked(task.isSolved());
+            solvedCheckBox.setChecked(tasksSolve[position]);
             TextView timeTextView = (TextView)convertView.findViewById(R.id.today_task_list_item_timeTextView);
             timeTextView.setText(task.getTaskTime(position));
 
@@ -77,12 +78,6 @@ public class TodayFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.today_fragment, null);
         final ListView lvMain = (ListView) view.findViewById(R.id.listViewSchedule);
-        mTasks = DayTimetable.get(getActivity()).getTasks();
-        queryTaskDBHelper(df.format(currDate));
-
-        TaskAdapter adapter = new TaskAdapter(mTasks);
-
-        lvMain.setAdapter(adapter);
 
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -92,7 +87,7 @@ public class TodayFragment extends Fragment {
                 i.putExtra(taskTitle, task.getTitle());
                 i.putExtra(taskPriority, task.getPriority());
                 i.putExtra(taskQuantityHours, Integer.toString(task.getNumberOfHoursToSolve()));
-                i.putExtra(taskIsSolved, (task.isSolved()? 1 : 0));
+                i.putExtra(taskIsSolved, (tasksSolve[position]? 1 : 0));
                 startActivity(i);
             }
         });
@@ -119,6 +114,8 @@ public class TodayFragment extends Fragment {
     public void onResume() {
         super.onResume();
         queryTaskDBHelper(df.format(currDate));
+        mTasks = DayTimetable.get(getActivity()).getTasks();
+        tasksSolve = DayTimetable.get(getActivity()).getSolvedTasks();
         ListView listView = (ListView) this.getActivity().findViewById(R.id.listViewSchedule);
         TaskAdapter adapter = new TaskAdapter(mTasks);
         listView.setAdapter(adapter);
@@ -130,6 +127,8 @@ public class TodayFragment extends Fragment {
         SQLiteDatabase db = taskDBHelper.getWritableDatabase();
 
         String sqlQuery = "select * from timetable where date = \"" + date + "\"";
+        Log.d(LOG_TAG, "--- Insert in mytable: ---" + date);
+
 
         Cursor c = db.rawQuery(sqlQuery, null);
         if (c != null) {
