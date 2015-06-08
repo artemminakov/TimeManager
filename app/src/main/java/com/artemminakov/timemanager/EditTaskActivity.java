@@ -37,23 +37,8 @@ public class EditTaskActivity extends Activity {
     private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
     private static final String COLUMN_TASK_SPENT_ON_SOLUTION = "spentOnSolution";
 
-    private static final String TABLE_TIMETABLE = "timetable";
-    private static final String COLUMN_TIMETABLE_DATE = "date";
-    private static final String COLUMN_TIMETABLE_TASKID1 = "taskId1";
-    private static final String COLUMN_TIMETABLE_TASKID2 = "taskId2";
-    private static final String COLUMN_TIMETABLE_TASKID3 = "taskId3";
-    private static final String COLUMN_TIMETABLE_TASKID4 = "taskId4";
-    private static final String COLUMN_TIMETABLE_TASKID5 = "taskId5";
-    private static final String COLUMN_TIMETABLE_TASKID6 = "taskId6";
-    private static final String COLUMN_TIMETABLE_TASKID7 = "taskId7";
-    private static final String COLUMN_TIMETABLE_TASKID8 = "taskId8";
-    private static final String COLUMN_TIMETABLE_TASKID9 = "taskId9";
-    private static final String COLUMN_TIMETABLE_TASKID10 = "taskId10";
-    private static final String COLUMN_TIMETABLE_TASKID11 = "taskId11";
-    private static final String COLUMN_TIMETABLE_TASKID12 = "taskId12";
-    private static final String COLUMN_TIMETABLE_TASKID13 = "taskId13";
-    private static final String COLUMN_TIMETABLE_TASKID14 = "taskId14";
-    private static final String COLUMN_TIMETABLE_TASKID15 = "taskId15";
+    private static final String TABLE_TIMETABLESOLVE = "timetableSolve";
+    private static final String COLUMN_TIMETABLESOLVE_DATE = "date";
 
     private String extraPriority;
     private int selectonPrioritySpinner = 1;
@@ -111,7 +96,7 @@ public class EditTaskActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (dateTimetable != null){
-                    taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1);
+                    taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1) + 1;
                     editSolveQueryTaskDBHelper(dateTimetable, taskPositionInTimetable);
                     finish();
                 }
@@ -161,7 +146,8 @@ public class EditTaskActivity extends Activity {
     private void editSolveQueryTaskDBHelper(String dateTimetable, int taskPosition) {
         taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
         SQLiteDatabase db = taskDBHelper.getWritableDatabase();
-        ContentValues cv = new ContentValues();
+        ContentValues cvTask = new ContentValues();
+        ContentValues cvTimetable = new ContentValues();
 
         String editTaskTitle = getIntent().getStringExtra(taskTitleName);
         int editTaskId = 1;
@@ -202,9 +188,13 @@ public class EditTaskActivity extends Activity {
         }
         c1.close();
 
-        cv.put(COLUMN_TASK_SPENT_ON_SOLUTION, spentOnSolution);
+        cvTask.put(COLUMN_TASK_SPENT_ON_SOLUTION, spentOnSolution);
 
-        db.update(TABLE_TASK, cv, "idTask = ?", new String[]{Integer.toString(editTaskId)});
+        db.update(TABLE_TASK, cvTask, "idTask = ?", new String[]{Integer.toString(editTaskId)});
+
+        cvTimetable.put("taskId" + taskPositionInTimetable , 1);
+
+        db.update(TABLE_TIMETABLESOLVE, cvTimetable, "date = ?", new String[]{dateTimetable});
 
     }
 

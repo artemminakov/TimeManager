@@ -62,6 +62,7 @@ public class AddTimetableOnDataActivity extends Activity {
     private static final String COLUMN_TASK_PRIORITY = "priority";
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
     private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
+    private static final String TABLE_TIMETABLESOLVE = "timetableSolve";
 
 
     public class TaskAdapter extends ArrayAdapter<Task> {
@@ -118,7 +119,6 @@ public class AddTimetableOnDataActivity extends Activity {
         }
         dateTimetable.append(month + 1).append(".").append(year);
         dateTimetableTitle.append(month + 1).append(".").append(year);
-        queryTaskDBHelper(dateTimetable.toString());
         TextView titleTextView = (TextView) findViewById(R.id.textViewHeaderAddTimetableOnData);
         StringBuilder title = new StringBuilder();
         title.append("Расписание на ").append(dateTimetableTitle);
@@ -126,10 +126,6 @@ public class AddTimetableOnDataActivity extends Activity {
 
         final ListView lvMain = (ListView) findViewById(R.id.listViewTasksAddTimetableOnData);
         mTasks = DayTimetable.get(this).getTasks();
-
-        TaskAdapter adapter = new TaskAdapter(mTasks);
-
-        lvMain.setAdapter(adapter);
 
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -151,7 +147,7 @@ public class AddTimetableOnDataActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.action_add_task:
                 Intent i = new Intent(this.getApplicationContext(), AddTaskToDayTimetableActivity.class);
-                addTaskToDatabase(dateTimetable);
+                addTaskToDatabase(dateTimetable.toString());
                 startActivity(i);
                 return true;
             /*case android.R.id.home:
@@ -227,26 +223,45 @@ public class AddTimetableOnDataActivity extends Activity {
         c.close();
     }
 
-    private void addTaskToDatabase(StringBuilder date) {
-        ContentValues cv = new ContentValues();
+    private void addTaskToDatabase(String date) {
+        ContentValues cvTimetable = new ContentValues();
+        ContentValues cvSolve = new ContentValues();
         SQLiteDatabase db = taskDBHelper.getWritableDatabase();
-        String d = date.toString();
-        cv.put(COLUMN_TIMETABLE_DATE, d);
-        cv.put(COLUMN_TIMETABLE_TASKID1, taskIds[0]);
-        cv.put(COLUMN_TIMETABLE_TASKID2, taskIds[1]);
-        cv.put(COLUMN_TIMETABLE_TASKID3, taskIds[2]);
-        cv.put(COLUMN_TIMETABLE_TASKID4, taskIds[3]);
-        cv.put(COLUMN_TIMETABLE_TASKID5, taskIds[4]);
-        cv.put(COLUMN_TIMETABLE_TASKID6, taskIds[5]);
-        cv.put(COLUMN_TIMETABLE_TASKID7, taskIds[6]);
-        cv.put(COLUMN_TIMETABLE_TASKID8, taskIds[7]);
-        cv.put(COLUMN_TIMETABLE_TASKID9, taskIds[8]);
-        cv.put(COLUMN_TIMETABLE_TASKID10, taskIds[9]);
-        cv.put(COLUMN_TIMETABLE_TASKID11, taskIds[10]);
-        cv.put(COLUMN_TIMETABLE_TASKID12, taskIds[11]);
-        cv.put(COLUMN_TIMETABLE_TASKID13, taskIds[12]);
-        cv.put(COLUMN_TIMETABLE_TASKID14, taskIds[13]);
-        cv.put(COLUMN_TIMETABLE_TASKID15, taskIds[14]);
-        db.insert(TABLE_TIMETABLE, null, cv);
+        cvTimetable.put(COLUMN_TIMETABLE_DATE, date);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID1, taskIds[0]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID2, taskIds[1]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID3, taskIds[2]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID4, taskIds[3]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID5, taskIds[4]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID6, taskIds[5]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID7, taskIds[6]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID8, taskIds[7]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID9, taskIds[8]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID10, taskIds[9]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID11, taskIds[10]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID12, taskIds[11]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID13, taskIds[12]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID14, taskIds[13]);
+        cvTimetable.put(COLUMN_TIMETABLE_TASKID15, taskIds[14]);
+        db.insert(TABLE_TIMETABLE, null, cvTimetable);
+
+        cvSolve.put(COLUMN_TIMETABLE_DATE, date);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID1, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID2, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID3, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID4, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID5, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID6, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID7, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID8, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID9, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID10, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID11, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID12, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID13, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID14, 0);
+        cvSolve.put(COLUMN_TIMETABLE_TASKID15, 0);
+
+        db.insert(TABLE_TIMETABLESOLVE, null, cvSolve);
     }
 }
