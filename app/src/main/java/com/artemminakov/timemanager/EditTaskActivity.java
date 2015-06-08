@@ -13,11 +13,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 
 public class EditTaskActivity extends Activity {
 
-    private static final String[] priority = {"Обычный", "Средний", "Высокий", "Повышенный"};
+    private static final String[] priority = {"Низкий", "Средний", "Высокий"};
 
     private static final String taskTitleName = "title";
     private static final String taskQuantityHoursName = "quantityHours";
@@ -30,11 +31,15 @@ public class EditTaskActivity extends Activity {
     private static final String COLUMN_TASK_PRIORITY = "priority";
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
     private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
+    private static final String taskExecuted = "executed";
+    private static final String timetableDate = "timetableDate";
 
     private String extraPriority;
     private int selectonPrioritySpinner = 1;
     private String taskPriority;
     private boolean isSolvedTask = false;
+    private String isExecutedTask;
+    private String dateTimetable;
 
     private TaskDatabaseHelper taskDBHelper;
 
@@ -51,6 +56,16 @@ public class EditTaskActivity extends Activity {
         quantityHoursEditText.setText(getIntent().getStringExtra(taskQuantityHoursName));
         final CheckBox checkBoxSolve = (CheckBox) findViewById(R.id.checkBox_EditTaskActivity);
         checkBoxSolve.setChecked((getIntent().getIntExtra(taskIsSolvedName, 1) != 0));
+        isExecutedTask = getIntent().getStringExtra(taskExecuted);
+        TextView checkBoxSolveTitle = (TextView) findViewById(R.id.checkboxTitle_textView_EditTaskActivity);
+        if (isExecutedTask != null){
+            editButton.setText("Выполнить!");
+        }
+        else {
+            checkBoxSolve.setVisibility(View.VISIBLE);
+            checkBoxSolveTitle.setVisibility(View.VISIBLE);
+        }
+        dateTimetable = getIntent().getStringExtra(timetableDate);
         Spinner prioritySpinner = (Spinner) findViewById(R.id.spinner_EditTaskActivity);
         for (int i = 0; i < priority.length; i++) {
             if (priority[i].equals(extraPriority)) {
@@ -73,9 +88,14 @@ public class EditTaskActivity extends Activity {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isSolvedTask = checkBoxSolve.isChecked();
-                editQueryTaskDBHelper(titleEditText.getText().toString(), taskPriority, quantityHoursEditText.getText().toString());
-                finish();
+                if (dateTimetable != null){
+
+                }
+                else{
+                    isSolvedTask = checkBoxSolve.isChecked();
+                    editQueryTaskDBHelper(titleEditText.getText().toString(), taskPriority, quantityHoursEditText.getText().toString());
+                    finish();
+                }
             }
         });
     }

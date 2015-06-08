@@ -29,6 +29,7 @@ public class AddTimetableOnDataActivity extends Activity {
     private String dayOfMonthCalendarView = "day";
     private int[] taskIds = {1, 3, 4, 6, 5, 7, 2, 1, 4, 5, 3, 7, 6, 4, 5};
     private StringBuilder dateTimetable = new StringBuilder();
+    private StringBuilder dateTimetableTitle = new StringBuilder();
 
     private int year;
     private int month;
@@ -111,11 +112,16 @@ public class AddTimetableOnDataActivity extends Activity {
             dateTimetable.append(0);
         }
         dateTimetable.append(dayOfMonth).append(".");
+        dateTimetableTitle.append(dateTimetable);
+        if (month<10){
+            dateTimetableTitle.append(0);
+        }
         dateTimetable.append(month + 1).append(".").append(year);
+        dateTimetableTitle.append(month + 1).append(".").append(year);
         queryTaskDBHelper(dateTimetable.toString());
         TextView titleTextView = (TextView) findViewById(R.id.textViewHeaderAddTimetableOnData);
         StringBuilder title = new StringBuilder();
-        title.append("Расписание на ").append(dateTimetable);
+        title.append("Расписание на ").append(dateTimetableTitle);
         titleTextView.setText(title);
 
         final ListView lvMain = (ListView) findViewById(R.id.listViewTasksAddTimetableOnData);

@@ -37,6 +37,8 @@ public class TodayFragment extends Fragment {
     private static final String taskPriority = "priority";
     private static final String taskQuantityHours = "quantityHours";
     private static final String taskIsSolved = "isSolved";
+    private static final String taskExecuted = "executed";
+    private static final String timetableDate = "timetableDate";
 
     private DateFormat df = new SimpleDateFormat("dd.M.yyyy");
     private Date currDate = new Date();
@@ -88,6 +90,8 @@ public class TodayFragment extends Fragment {
                 i.putExtra(taskPriority, task.getPriority());
                 i.putExtra(taskQuantityHours, Integer.toString(task.getNumberOfHoursToSolve()));
                 i.putExtra(taskIsSolved, (tasksSolve[position]? 1 : 0));
+                i.putExtra(taskExecuted, "Executed");
+                i.putExtra(timetableDate, df.format(currDate));
                 startActivity(i);
             }
         });
@@ -98,6 +102,7 @@ public class TodayFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+
         super.onDestroy();
         DayTimetable.get(getActivity()).clear();
     }

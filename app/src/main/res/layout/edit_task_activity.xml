@@ -99,6 +99,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:visibility="gone"
         android:text="Решено"
         android:id="@+id/checkboxTitle_textView_EditTaskActivity"
         android:textColor="#5af0faff"
@@ -111,6 +112,7 @@
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:id="@+id/checkBox_EditTaskActivity"
         android:layout_below="@+id/spinner_EditTaskActivity"
         android:layout_alignLeft="@+id/checkboxTitle_textView_EditTaskActivity"

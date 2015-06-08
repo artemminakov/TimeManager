@@ -135,7 +135,6 @@ public class TasksFragment extends Fragment {
         taskPriority = data.getStringExtra("priority");
         Task task = new Task(taskTitle, taskPriority, taskQuantityHours, false);
         addTaskToDatabase(task);
-        TaskLab.get(getActivity()).addTask(task);
     }
 
     @Override

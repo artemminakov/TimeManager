@@ -12,7 +12,7 @@ import android.widget.Spinner;
 
 public class AddTaskActivity extends Activity{
 
-    private String[] priority = {"Обычный", "Средний", "Высокий", "Повышенный"};
+    private String[] priority = {"Низкий", "Средний", "Высокий"};
 
     private String taskTitleName = "title";
     private String taskQuantityHoursName = "quantity";

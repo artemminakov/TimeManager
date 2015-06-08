@@ -54,9 +54,9 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        /*countCurrentTask = 0;
+        countCurrentTask = 0;
         countExecuteTask = 0;
-        countOverdueTask = 0;*/
+        countOverdueTask = 0;
     }
 
     private void queryTaskDBHelper(String date) {
