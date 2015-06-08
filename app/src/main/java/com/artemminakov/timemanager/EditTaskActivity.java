@@ -192,6 +192,48 @@ public class EditTaskActivity extends Activity {
 
         db.update(TABLE_TASK, cvTask, "idTask = ?", new String[]{Integer.toString(editTaskId)});
 
+        Cursor c2 = db.rawQuery("select * from timetableSolve where date = \"" + dateTimetable + "\"", null);
+        if (c2 != null) {
+            if (c2.moveToFirst()) {
+                Log.d(LOG_TAG, "--- TimetableSolve ---");
+                int colIndex1 = c2.getColumnIndex("idTimetableSolve");
+                Log.d(LOG_TAG, "--- 1 ---" + c2.getString(colIndex1));
+                int colIndex2 = c2.getColumnIndex("date");
+                Log.d(LOG_TAG, "--- 2 ---" + c2.getString(colIndex2));
+                int colIndex3 = c2.getColumnIndex("taskId1");
+                Log.d(LOG_TAG, "--- 3 ---" + c2.getString(colIndex3));
+                int colIndex4 = c2.getColumnIndex("taskId2");
+                Log.d(LOG_TAG, "--- 4 ---" + c2.getString(colIndex4));
+                int colIndex5 = c2.getColumnIndex("taskId3");
+                Log.d(LOG_TAG, "--- 5 ---" + c2.getString(colIndex5));
+                int colIndex6 = c2.getColumnIndex("taskId4");
+                Log.d(LOG_TAG, "--- 6 ---" + c2.getString(colIndex6));
+                int colIndex7 = c2.getColumnIndex("taskId5");
+                Log.d(LOG_TAG, "--- 7 ---" + c2.getString(colIndex7));
+                int colIndex8 = c2.getColumnIndex("taskId6");
+                Log.d(LOG_TAG, "--- 8 ---" + c2.getString(colIndex8));
+                int colIndex9 = c2.getColumnIndex("taskId7");
+                Log.d(LOG_TAG, "--- 9 ---" + c2.getString(colIndex9));
+                int colIndex10 = c2.getColumnIndex("taskId8");
+                Log.d(LOG_TAG, "--- 10 ---" + c2.getString(colIndex10));
+                int colIndex11 = c2.getColumnIndex("taskId9");
+                Log.d(LOG_TAG, "--- 11 ---" + c2.getString(colIndex11));
+                int colIndex12 = c2.getColumnIndex("taskId10");
+                Log.d(LOG_TAG, "--- 12 ---" + c2.getString(colIndex12));
+                int colIndex13 = c2.getColumnIndex("taskId11");
+                Log.d(LOG_TAG, "--- 13 ---" + c2.getString(colIndex13));
+                int colIndex14 = c2.getColumnIndex("taskId12");
+                Log.d(LOG_TAG, "--- 14 ---" + c2.getString(colIndex14));
+                int colIndex15 = c2.getColumnIndex("taskId13");
+                Log.d(LOG_TAG, "--- 15 ---" + c2.getString(colIndex15));
+                int colIndex16 = c2.getColumnIndex("taskId14");
+                Log.d(LOG_TAG, "--- 16 ---" + c2.getString(colIndex16));
+                int colIndex17 = c2.getColumnIndex("taskId15");
+                Log.d(LOG_TAG, "--- 17 ---" + c2.getString(colIndex17));
+            }
+        }
+        c2.close();
+
         cvTimetable.put("taskId" + taskPositionInTimetable , 1);
 
         db.update(TABLE_TIMETABLESOLVE, cvTimetable, "date = ?", new String[]{dateTimetable});

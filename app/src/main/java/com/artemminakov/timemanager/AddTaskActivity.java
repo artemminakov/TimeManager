@@ -43,12 +43,15 @@ public class AddTaskActivity extends Activity{
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.putExtra(taskPriorityName, taskPriority);
-                intent.putExtra(taskTitleName, titleEditText.getText().toString());
-                intent.putExtra(taskQuantityHoursName, quantityHoursEditText.getText().toString());
-                setResult(RESULT_OK, intent);
-                finish();
+                if (!titleEditText.getText().toString().matches("") &&
+                        !quantityHoursEditText.getText().toString().matches("")) {
+                    Intent intent = new Intent();
+                    intent.putExtra(taskPriorityName, taskPriority);
+                    intent.putExtra(taskTitleName, titleEditText.getText().toString());
+                    intent.putExtra(taskQuantityHoursName, quantityHoursEditText.getText().toString());
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
             }
         });
     }

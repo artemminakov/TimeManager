@@ -14,34 +14,16 @@
         android:layout_gravity="center_horizontal"
         android:layout_centerHorizontal="true"/>
 
-    <EditText
+    <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="date"
-        android:ems="10"
-        android:id="@+id/editText"
-        android:layout_gravity="center_horizontal"
-        android:paddingTop="10pt"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:entries="@array/items_statistics"
+        android:id="@+id/spinner_StatisticsFragment"
+        android:background="@android:color/transparent"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/current_task"
-        android:id="@+id/textViewStatisticsFragmentCurrentTasks"
-        android:paddingTop="15pt"
-        android:textSize="25dp"
-        android:paddingLeft="15dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/textViewStatisticsFragmentCurrentTasksCount"
-        android:textSize="25dp"
-        android:paddingLeft="130dp" />
+        android:textSize="35dp"
+        android:paddingLeft="15dp"
+        android:paddingTop="15pt"/>
 
     <TextView
         android:layout_width="wrap_content"

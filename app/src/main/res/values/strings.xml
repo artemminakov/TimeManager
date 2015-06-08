@@ -16,6 +16,12 @@
         <item>Средний</item>
         <item>Высокий</item>
     </string-array>
+    /string-array>
+    <string-array name="items_statistics">
+        <item>Сегодня</item>
+        <item>За неделю</item>
+        <item>За месяц</item>
+    </string-array>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="new_task">New Task</string>
     <string name="drawer_close">Close navigation drawer</string>
