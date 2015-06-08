@@ -35,6 +35,7 @@ public class TasksFragment extends Fragment {
     private static final String COLUMN_TASK_PRIORITY = "priority";
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
     private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
+    private static final String COLUMN_TASK_SPENT_ON_SOLUTION = "spentOnSolution";
 
     TaskDatabaseHelper taskDBHelper;
 
@@ -183,6 +184,7 @@ public class TasksFragment extends Fragment {
         cv.put(COLUMN_TASK_PRIORITY, task.getPriority());
         cv.put(COLUMN_TASK_QUANTITY_HOURS, task.getNumberOfHoursToSolve());
         cv.put(COLUMN_TASK_IS_SOLVED, (task.isSolved() ? 1 : 0));
+        cv.put(COLUMN_TASK_SPENT_ON_SOLUTION, 0);
         db.insert(TABLE_TASK, null, cv);
     }
 
