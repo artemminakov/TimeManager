@@ -25,7 +25,8 @@ public class TodayFragment extends Fragment {
 
     private ArrayList<Task> mTasks;
     private TaskDatabaseHelper taskDBHelper;
-    private boolean[] tasksSolve;
+    private boolean[] tasksSolve = new boolean[15];
+    private int positionInTaskSolve = 0;
     final String LOG_TAG = "myLogs";
 
     private static final String COLUMN_TASK_TITLE = "title";
@@ -122,7 +123,6 @@ public class TodayFragment extends Fragment {
         super.onResume();
         queryTaskDBHelper(df.format(currDate));
         mTasks = DayTimetable.get(getActivity()).getTasks();
-        tasksSolve = DayTimetable.get(getActivity()).getSolvedTasks();
         ListView listView = (ListView) this.getActivity().findViewById(R.id.listViewSchedule);
         TaskAdapter adapter = new TaskAdapter(mTasks);
         listView.setAdapter(adapter);
@@ -144,28 +144,56 @@ public class TodayFragment extends Fragment {
                 do {
                     sb.setLength(0);
                     for (String cn : c.getColumnNames()) {
-                        Cursor c1 = db.rawQuery("select * from task where idTask = \"" + c.getString(c.getColumnIndex(cn)) + "\"", null);
-                        if (c1 != null) {
-                            if (c1.moveToFirst()) {
-                                int titleColIndex = c1.getColumnIndex(COLUMN_TASK_TITLE);
-                                int priorityColIndex = c1.getColumnIndex(COLUMN_TASK_PRIORITY);
-                                int quantityHColIndex = c1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
-                                int isSolvedColIndex = c1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
-                                Task resTask = new Task();
-                                resTask.setTitle(c1.getString(titleColIndex));
-                                resTask.setPriority(c1.getString(priorityColIndex));
-                                resTask.setNumberOfHoursToSolve(c1.getInt(quantityHColIndex));
-                                resTask.setIsSolved((c1.getInt(isSolvedColIndex) != 0));
-                                DayTimetable.get(this.getActivity().getApplicationContext()).addTask(resTask);
+                        if (cn.matches("idTimetable") || cn.matches("date")) {
+                            continue;
+                        } else {
+                            Cursor c1 = db.rawQuery("select * from task where idTask = \"" + c.getString(c.getColumnIndex(cn)) + "\"", null);
+                            if (c1 != null) {
+                                if (c1.moveToFirst()) {
+                                    int titleColIndex = c1.getColumnIndex(COLUMN_TASK_TITLE);
+                                    int priorityColIndex = c1.getColumnIndex(COLUMN_TASK_PRIORITY);
+                                    int quantityHColIndex = c1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
+                                    int isSolvedColIndex = c1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
+                                    Task resTask = new Task();
+                                    resTask.setTitle(c1.getString(titleColIndex));
+                                    resTask.setPriority(c1.getString(priorityColIndex));
+                                    resTask.setNumberOfHoursToSolve(c1.getInt(quantityHColIndex));
+                                    resTask.setIsSolved((c1.getInt(isSolvedColIndex) != 0));
+                                    DayTimetable.get(this.getActivity().getApplicationContext()).addTask(resTask);
+                                }
                             }
+                            c1.close();
                         }
-                        c1.close();
                     }
                 } while (c.moveToNext());
             }
         } else
 
         c.close();
+
+        Cursor c2 = db.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
+        if (c2 != null) {
+            if (c2.moveToFirst()) {
+                do {
+                    for (String cn : c2.getColumnNames()) {
+                        if (cn.matches("idTimetableSolve") || cn.matches("date")) {
+                            continue;
+                        } else {
+                            int isSolvedColIndex = c2.getColumnIndex(cn);
+                            boolean isSolved = (c2.getInt(isSolvedColIndex) != 0);
+                            if (isSolved) {
+                                tasksSolve[positionInTaskSolve++] = true;
+                            } else {
+                                tasksSolve[positionInTaskSolve++] = false;
+                            }
+                        }
+                    }
+                } while (c2.moveToNext());
+            }
+        }
+
+        c2.close();
+        positionInTaskSolve = 0;
     }
 
 }

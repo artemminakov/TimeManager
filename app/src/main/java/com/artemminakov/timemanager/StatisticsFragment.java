@@ -145,7 +145,7 @@ public class StatisticsFragment extends Fragment {
                     }
                 } while (c.moveToNext());
             }
-        } else
+        }
 
             c.close();
     }

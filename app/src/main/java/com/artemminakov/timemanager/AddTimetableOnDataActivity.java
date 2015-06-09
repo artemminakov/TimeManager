@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +28,10 @@ public class AddTimetableOnDataActivity extends Activity {
     private String yearCalendarView = "year";
     private String monthCalendarView = "month";
     private String dayOfMonthCalendarView = "day";
-    private int[] taskIds = {1, 3, 4, 6, 5, 7, 2, 1, 4, 5, 3, 7, 6, 4, 5};
+    private int[] taskIds = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    private int positionInTasksIds = 0;
+    private boolean[] tasksSolve = new boolean[15];
+    private int positionInTaskSolve = 0;
     private StringBuilder dateTimetable = new StringBuilder();
     private StringBuilder dateTimetableTitle = new StringBuilder();
 
@@ -63,6 +67,9 @@ public class AddTimetableOnDataActivity extends Activity {
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
     private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
     private static final String TABLE_TIMETABLESOLVE = "timetableSolve";
+    private static final String taskExecuted = "executed";
+    private static final String timetableDate = "timetableDate";
+    private static final String taskPosition = "taskPosition";
 
 
     public class TaskAdapter extends ArrayAdapter<Task> {
@@ -84,7 +91,7 @@ public class AddTimetableOnDataActivity extends Activity {
             TextView titleTextView = (TextView) convertView.findViewById(R.id.today_task_list_item_titleTextView);
             titleTextView.setText(task.getTitle());
             CheckBox solvedCheckBox = (CheckBox) convertView.findViewById(R.id.today_task_list_item_solvedCheckBox);
-            solvedCheckBox.setChecked(task.isSolved());
+            solvedCheckBox.setChecked(tasksSolve[position]);
             TextView timeTextView = (TextView) convertView.findViewById(R.id.today_task_list_item_timeTextView);
             timeTextView.setText(task.getTaskTime(position));
 
@@ -135,7 +142,10 @@ public class AddTimetableOnDataActivity extends Activity {
                 i.putExtra(COLUMN_TASK_TITLE, task.getTitle());
                 i.putExtra(COLUMN_TASK_PRIORITY, task.getPriority());
                 i.putExtra(COLUMN_TASK_QUANTITY_HOURS, Integer.toString(task.getNumberOfHoursToSolve()));
-                i.putExtra(COLUMN_TASK_IS_SOLVED, (task.isSolved()? 1 : 0));
+                i.putExtra(COLUMN_TASK_IS_SOLVED, (tasksSolve[position]? 1 : 0));
+                i.putExtra(taskExecuted, "Executed");
+                i.putExtra(timetableDate, dateTimetable.toString());
+                i.putExtra(taskPosition, position);
                 startActivity(i);
             }
         });
@@ -147,17 +157,33 @@ public class AddTimetableOnDataActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.action_add_task:
                 Intent i = new Intent(this.getApplicationContext(), AddTaskToDayTimetableActivity.class);
-                addTaskToDatabase(dateTimetable.toString());
-                startActivity(i);
+                startActivityForResult(i, 0);
                 return true;
-            /*case android.R.id.home:
+            case android.R.id.home:
                 if (NavUtils.getParentActivityName(this) != null){
                     NavUtils.navigateUpFromSameTask(this);
                 }
-                return true;*/
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {
+            return;
+        }
+        int taskResId = 0;
+        for (int i = 0; i < taskIds.length; i++){
+            if (taskIds[i] == 0) {
+                positionInTasksIds = 0;
+                break;
+            }
+        }
+        taskResId = Integer.parseInt(data.getStringExtra("taskId"));
+        taskIds[positionInTasksIds] = taskResId;
+        addTaskToDatabase(dateTimetable.toString());
     }
 
     @Override
@@ -199,28 +225,58 @@ public class AddTimetableOnDataActivity extends Activity {
                 do {
                     sb.setLength(0);
                     for (String cn : c.getColumnNames()) {
-                        Cursor c1 = db.rawQuery("select * from task where idTask = \"" + c.getString(c.getColumnIndex(cn)) + "\"", null);
-                        if (c1 != null) {
-                            if (c1.moveToFirst()) {
-                                int titleColIndex = c1.getColumnIndex(COLUMN_TASK_TITLE);
-                                int priorityColIndex = c1.getColumnIndex(COLUMN_TASK_PRIORITY);
-                                int quantityHColIndex = c1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
-                                int isSolvedColIndex = c1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
-                                Task resTask = new Task();
-                                resTask.setTitle(c1.getString(titleColIndex));
-                                resTask.setPriority(c1.getString(priorityColIndex));
-                                resTask.setNumberOfHoursToSolve(c1.getInt(quantityHColIndex));
-                                resTask.setIsSolved((c1.getInt(isSolvedColIndex) != 0));
-                                DayTimetable.get(getApplicationContext()).addTask(resTask);
+                        if (cn.matches("idTimetable") || cn.matches("date")) {
+                            continue;
+                        } else {
+                            Cursor c1 = db.rawQuery("select * from task where idTask = \"" + c.getString(c.getColumnIndex(cn)) + "\"", null);
+                            if (c1 != null) {
+                                if (c1.moveToFirst()) {
+                                    int titleColIndex = c1.getColumnIndex(COLUMN_TASK_TITLE);
+                                    int priorityColIndex = c1.getColumnIndex(COLUMN_TASK_PRIORITY);
+                                    int quantityHColIndex = c1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
+                                    int isSolvedColIndex = c1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
+                                    Task resTask = new Task();
+                                    resTask.setTitle(c1.getString(titleColIndex));
+                                    resTask.setPriority(c1.getString(priorityColIndex));
+                                    resTask.setNumberOfHoursToSolve(c1.getInt(quantityHColIndex));
+                                    resTask.setIsSolved((c1.getInt(isSolvedColIndex) != 0));
+                                    DayTimetable.get(getApplicationContext()).addTask(resTask);
+                                }
                             }
+                            c1.close();
                         }
-                        c1.close();
                     }
                 } while (c.moveToNext());
             }
-        } else
+        }
 
         c.close();
+
+        Cursor c2 = db.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
+        if (c2 != null) {
+            if (c2.moveToFirst()) {
+                do {
+                    for (String cn : c2.getColumnNames()) {
+                        if (cn.matches("idTimetableSolve") || cn.matches("date")) {
+                            continue;
+                        } else {
+                            int isSolvedColIndex = c2.getColumnIndex(cn);
+                            boolean isSolved = (c2.getInt(isSolvedColIndex) != 0);
+                            if (positionInTaskSolve < tasksSolve.length) {
+                                if (isSolved) {
+                                    tasksSolve[positionInTaskSolve++] = true;
+                                } else {
+                                    tasksSolve[positionInTaskSolve++] = false;
+                                }
+                            }
+                        }
+                    }
+                } while (c2.moveToNext());
+            }
+        }
+
+        c2.close();
+        positionInTaskSolve = 0;
     }
 
     private void addTaskToDatabase(String date) {

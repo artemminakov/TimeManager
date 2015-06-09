@@ -13,7 +13,6 @@ public class DayTimetable {
     private static DayTimetable sDayTimetable;
     private Context mAppContext;
     private Date mDate;
-    private boolean solvedTasks[] = {false, false, true, false, false, true, false, false, true, false, false, true, false, false, true};
 
     private DayTimetable(Context appContext) {
         mAppContext = appContext;
@@ -46,10 +45,6 @@ public class DayTimetable {
         return mDate;
     }
 
-    public boolean[] getSolvedTasks(){
-        return solvedTasks;
-    }
-
     public void setDate(Date mDate) {
         this.mDate = mDate;
     }
@@ -62,6 +57,9 @@ public class DayTimetable {
     }
 
     public void clear(){
+        if (mTasks.isEmpty()){
+            return;
+        }
         mTasks.clear();
     }
 }
