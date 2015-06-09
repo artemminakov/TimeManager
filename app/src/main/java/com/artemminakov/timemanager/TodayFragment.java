@@ -1,9 +1,15 @@
 package com.artemminakov.timemanager;
 
 import android.app.Fragment;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +24,7 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -41,6 +48,7 @@ public class TodayFragment extends Fragment {
     private static final String taskExecuted = "executed";
     private static final String timetableDate = "timetableDate";
     private static final String taskPosition = "taskPosition";
+    private static final int NOTIFY_ID = 101;
 
     private DateFormat df = new SimpleDateFormat("dd.M.yyyy");
     private Date currDate = new Date();
@@ -81,6 +89,7 @@ public class TodayFragment extends Fragment {
 
 
         View view = inflater.inflate(R.layout.today_fragment, null);
+        notificationImportantTask();
         final ListView lvMain = (ListView) view.findViewById(R.id.listViewSchedule);
 
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -181,10 +190,12 @@ public class TodayFragment extends Fragment {
                         } else {
                             int isSolvedColIndex = c2.getColumnIndex(cn);
                             boolean isSolved = (c2.getInt(isSolvedColIndex) != 0);
-                            if (isSolved) {
-                                tasksSolve[positionInTaskSolve++] = true;
-                            } else {
-                                tasksSolve[positionInTaskSolve++] = false;
+                            if (positionInTaskSolve < 15) {
+                                if (isSolved) {
+                                    tasksSolve[positionInTaskSolve++] = true;
+                                } else {
+                                    tasksSolve[positionInTaskSolve++] = false;
+                                }
                             }
                         }
                     }
@@ -196,4 +207,37 @@ public class TodayFragment extends Fragment {
         positionInTaskSolve = 0;
     }
 
+    private void notificationImportantTask(){
+        Context context = getActivity().getApplicationContext();
+
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(context,
+                0, notificationIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Resources res = context.getResources();
+        Notification.Builder builder = new Notification.Builder(context);
+        String str = new SimpleDateFormat("HH:mm").format(Calendar.getInstance().getTime());
+
+        builder.setContentIntent(contentIntent)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.ic_drawer))
+                        //.setTicker(res.getString(R.string.warning)) // текст в строке состояния
+                .setTicker("Важная задача!!!")
+                .setWhen(System.currentTimeMillis())
+                .setAutoCancel(true)
+                        //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
+                .setContentTitle("Напоминание")
+                        //.setContentText(res.getString(R.string.notifytext))
+                .setContentText("Делай дело!"); // Текст уведомленимя
+
+        // Notification notification = builder.getNotification(); // до API 16
+        //if(str.matches("01:25")) {
+            Notification notification = builder.getNotification();
+
+            NotificationManager notificationManager = (NotificationManager) context
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(NOTIFY_ID, notification);
+       // }
+    }
 }

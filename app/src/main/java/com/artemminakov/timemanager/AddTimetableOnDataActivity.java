@@ -116,12 +116,12 @@ public class AddTimetableOnDataActivity extends Activity {
         year = getIntent().getIntExtra(yearCalendarView, 2015);
         month = getIntent().getIntExtra(monthCalendarView, 1);
         dayOfMonth = getIntent().getIntExtra(dayOfMonthCalendarView, 1);
-        if(dayOfMonth<10){
+        if (dayOfMonth < 10) {
             dateTimetable.append(0);
         }
         dateTimetable.append(dayOfMonth).append(".");
         dateTimetableTitle.append(dateTimetable);
-        if (month<10){
+        if (month < 10) {
             dateTimetableTitle.append(0);
         }
         dateTimetable.append(month + 1).append(".").append(year);
@@ -138,11 +138,11 @@ public class AddTimetableOnDataActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(getApplicationContext(), EditTaskActivity.class);
-                Task task = (Task)lvMain.getItemAtPosition(position);
+                Task task = (Task) lvMain.getItemAtPosition(position);
                 i.putExtra(COLUMN_TASK_TITLE, task.getTitle());
                 i.putExtra(COLUMN_TASK_PRIORITY, task.getPriority());
                 i.putExtra(COLUMN_TASK_QUANTITY_HOURS, Integer.toString(task.getNumberOfHoursToSolve()));
-                i.putExtra(COLUMN_TASK_IS_SOLVED, (tasksSolve[position]? 1 : 0));
+                i.putExtra(COLUMN_TASK_IS_SOLVED, (tasksSolve[position] ? 1 : 0));
                 i.putExtra(taskExecuted, "Executed");
                 i.putExtra(timetableDate, dateTimetable.toString());
                 i.putExtra(taskPosition, position);
@@ -156,11 +156,14 @@ public class AddTimetableOnDataActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_task:
-                Intent i = new Intent(this.getApplicationContext(), AddTaskToDayTimetableActivity.class);
-                startActivityForResult(i, 0);
+                if (mTasks.size() < 15) {
+                    Intent i = new Intent(this.getApplicationContext(), AddTaskToDayTimetableActivity.class);
+                    startActivityForResult(i, 0);
+                    return true;
+                }
                 return true;
             case android.R.id.home:
-                if (NavUtils.getParentActivityName(this) != null){
+                if (NavUtils.getParentActivityName(this) != null) {
                     NavUtils.navigateUpFromSameTask(this);
                 }
                 return true;
@@ -174,20 +177,14 @@ public class AddTimetableOnDataActivity extends Activity {
         if (data == null) {
             return;
         }
-        int taskResId = 0;
-        for (int i = 0; i < taskIds.length; i++){
-            if (taskIds[i] == 0) {
-                positionInTasksIds = 0;
-                break;
-            }
-        }
+        int taskResId;
         taskResId = Integer.parseInt(data.getStringExtra("taskId"));
         taskIds[positionInTasksIds] = taskResId;
         addTaskToDatabase(dateTimetable.toString());
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         DayTimetable.get(getApplicationContext()).clear();
         Log.d(LOG_TAG, "onPause()");
@@ -301,23 +298,39 @@ public class AddTimetableOnDataActivity extends Activity {
         cvTimetable.put(COLUMN_TIMETABLE_TASKID15, taskIds[14]);
         db.insert(TABLE_TIMETABLE, null, cvTimetable);
 
-        cvSolve.put(COLUMN_TIMETABLE_DATE, date);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID1, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID2, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID3, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID4, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID5, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID6, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID7, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID8, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID9, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID10, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID11, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID12, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID13, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID14, 0);
-        cvSolve.put(COLUMN_TIMETABLE_TASKID15, 0);
+        if (isCreateTableSolve(date)) {
+            cvSolve.put(COLUMN_TIMETABLE_DATE, date);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID1, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID2, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID3, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID4, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID5, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID6, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID7, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID8, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID9, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID10, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID11, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID12, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID13, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID14, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKID15, 0);
 
-        db.insert(TABLE_TIMETABLESOLVE, null, cvSolve);
+            db.insert(TABLE_TIMETABLESOLVE, null, cvSolve);
+        }
+    }
+
+    private boolean isCreateTableSolve(String date) {
+        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
+        Cursor c2 = db.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
+        if (c2 != null) {
+            if (c2.moveToFirst()) {
+                c2.close();
+                return false;
+            }
+        }
+
+        c2.close();
+        return true;
     }
 }

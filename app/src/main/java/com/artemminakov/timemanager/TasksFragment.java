@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -82,6 +83,25 @@ public class TasksFragment extends Fragment {
         }
     }
 
+    /*@Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo){
+        getActivity().getMenuInflater().inflate(R.menu.task_list_item_context, menu);
+    }*/
+
+    /*@Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int position = info.position;
+        TaskAdapter adapter = new TaskAdapter(mTasks);
+        Task task = adapter.getItem(position);
+        switch (item.getItemId()) {
+            case R.id.menu_item_delete_task:
+                TaskLab.get(getActivity()).deleteTask(task);
+                adapter.notifyDataSetChanged();
+                return true;
+        }
+        return super.onContextItemSelected(item);
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,6 +111,7 @@ public class TasksFragment extends Fragment {
         View view = inflater.inflate(R.layout.tasks_fragment, null);
         mTasks = TaskLab.get(getActivity()).getTasks();
         final ListView lvMain = (ListView) view.findViewById(R.id.listViewTasks);
+        registerForContextMenu(lvMain);
         setHasOptionsMenu(true);
 
 

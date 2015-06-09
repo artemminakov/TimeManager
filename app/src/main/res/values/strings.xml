@@ -4,6 +4,7 @@
     <string name="app_name">TimeManager</string>
     <string name="tasks_title">Tasks</string>
     <string name="action_settings">Settings</string>
+    <string name="delete_task">Удалить</string>
     <string-array name="items_array">
         <item>Главная</item>
         <item>Сегодня</item>
