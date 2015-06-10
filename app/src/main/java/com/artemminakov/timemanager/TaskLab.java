@@ -46,7 +46,7 @@ public class TaskLab {
         mTasks.clear();
     }
 
-    public void deleteTask(Task task){
+    public void deleteTask(Task task) {
         mTasks.remove(task);
     }
 }

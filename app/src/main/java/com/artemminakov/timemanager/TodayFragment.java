@@ -29,7 +29,6 @@ public class TodayFragment extends Fragment {
     private TaskDatabaseHelper taskDBHelper;
     private boolean[] tasksSolve = new boolean[15];
     private int positionInTaskSolve = 0;
-    final String LOG_TAG = "myLogs";
     private static String[] taskTime = {"08", "09", "10", "11", "12", "13", "14", "15", "16", "17",
             "18", "19", "20", "21", "22"};
     private static String[] taskTimePriorityH = new String[15];
@@ -52,24 +51,24 @@ public class TodayFragment extends Fragment {
     private DateFormat df = new SimpleDateFormat("dd.M.yyyy");
     private Date currDate = new Date();
 
-    public class TaskAdapter extends ArrayAdapter<Task>{
-        public TaskAdapter(ArrayList<Task> tasks){
+    public class TaskAdapter extends ArrayAdapter<Task> {
+        public TaskAdapter(ArrayList<Task> tasks) {
             super(getActivity(), 0, tasks);
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent){
-            if (convertView == null){
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_today_task, null);
             }
 
             Task task = getItem(position);
 
-            TextView titleTextView = (TextView)convertView.findViewById(R.id.today_task_list_item_titleTextView);
+            TextView titleTextView = (TextView) convertView.findViewById(R.id.today_task_list_item_titleTextView);
             titleTextView.setText(task.getTitle());
-            CheckBox solvedCheckBox = (CheckBox)convertView.findViewById(R.id.today_task_list_item_solvedCheckBox);
+            CheckBox solvedCheckBox = (CheckBox) convertView.findViewById(R.id.today_task_list_item_solvedCheckBox);
             solvedCheckBox.setChecked(tasksSolve[position]);
-            TextView timeTextView = (TextView)convertView.findViewById(R.id.today_task_list_item_timeTextView);
+            TextView timeTextView = (TextView) convertView.findViewById(R.id.today_task_list_item_timeTextView);
             timeTextView.setText(task.getTaskTime(position));
 
 
@@ -94,11 +93,11 @@ public class TodayFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(getActivity().getApplicationContext(), EditTaskActivity.class);
-                Task task = (Task)lvMain.getItemAtPosition(position);
+                Task task = (Task) lvMain.getItemAtPosition(position);
                 i.putExtra(taskTitle, task.getTitle());
                 i.putExtra(taskPriority, task.getPriority());
                 i.putExtra(taskQuantityHours, Integer.toString(task.getNumberOfHoursToSolve()));
-                i.putExtra(taskIsSolved, (tasksSolve[position]? 1 : 0));
+                i.putExtra(taskIsSolved, (tasksSolve[position] ? 1 : 0));
                 i.putExtra(taskExecuted, "Executed");
                 i.putExtra(timetableDate, df.format(currDate));
                 i.putExtra(taskPosition, position);
@@ -162,8 +161,8 @@ public class TodayFragment extends Fragment {
                                     int isSolvedColIndex = c1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
                                     Task resTask = new Task();
                                     String var = c1.getString(priorityColIndex);
-                                    int temp = c.getColumnIndex(cn)-2;
-                                    if (var.matches("Высокий")){
+                                    int temp = c.getColumnIndex(cn) - 2;
+                                    if (var.matches("Высокий")) {
                                         if (temp < 15 && positionInTaskTimePriorityH < 15) {
                                             taskTimePriorityH[positionInTaskTimePriorityH] =
                                                     taskTime[temp];
@@ -185,7 +184,7 @@ public class TodayFragment extends Fragment {
             }
         } else
 
-        c.close();
+            c.close();
 
         Cursor c2 = db.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
         if (c2 != null) {

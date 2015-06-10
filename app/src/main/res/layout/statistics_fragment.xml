@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1"
-    android:background="#3f638b">
+    android:background="@color/backgroundBodyLight">
 
     <TextView
         android:layout_width="wrap_content"
@@ -11,19 +11,20 @@
         android:id="@+id/textViewStatisticsFragmentHeader"
         android:text="Статистика"
         android:textSize="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
         android:layout_gravity="center_horizontal"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:textStyle="italic" />
 
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@array/items_statistics"
         android:id="@+id/spinner_StatisticsFragment"
-        android:background="@android:color/transparent"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="35dp"
         android:paddingLeft="15dp"
-        android:paddingTop="15pt"/>
+        android:paddingTop="15pt" />
 
     <TextView
         android:layout_width="wrap_content"

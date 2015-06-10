@@ -1,18 +1,14 @@
 package com.artemminakov.timemanager;
 
 import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,17 +19,12 @@ import java.util.ArrayList;
 public class AddTaskToDayTimetableActivity extends Activity {
 
     private ArrayList<Task> mTasks;
-    private String taskTitle;
-    private String taskPriority;
-    private int taskQuantityHours;
-    final String LOG_TAG = "myLogs";
 
     private static final String TABLE_TASK = "task";
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
     private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
-    private static final String COLUMN_TASK_SPENT_ON_SOLUTION = "spentOnSolution";
 
     TaskDatabaseHelper taskDBHelper;
 
@@ -65,7 +56,7 @@ public class AddTaskToDayTimetableActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.add_task_to_day_timetable_activity);
         mTasks = TaskLab.get(this).getTasks();
         final ListView lvMain = (ListView) findViewById(R.id.listViewTasks_AddToDay);
@@ -75,7 +66,7 @@ public class AddTaskToDayTimetableActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
                 StringBuilder posTask = new StringBuilder();
-                posTask.append(position+1);
+                posTask.append(position + 1);
                 intent.putExtra("taskId", posTask.toString());
                 setResult(RESULT_OK, intent);
                 finish();
@@ -100,7 +91,7 @@ public class AddTaskToDayTimetableActivity extends Activity {
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         TaskLab.get(this).clear();
     }

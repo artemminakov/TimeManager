@@ -19,7 +19,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
@@ -119,11 +118,11 @@ public class TasksFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(getActivity().getApplicationContext(), EditTaskActivity.class);
-                Task task = (Task)lvMain.getItemAtPosition(position);
+                Task task = (Task) lvMain.getItemAtPosition(position);
                 i.putExtra(COLUMN_TASK_TITLE, task.getTitle());
                 i.putExtra(COLUMN_TASK_PRIORITY, task.getPriority());
                 i.putExtra(COLUMN_TASK_QUANTITY_HOURS, Integer.toString(task.getNumberOfHoursToSolve()));
-                i.putExtra(COLUMN_TASK_IS_SOLVED, (task.isSolved()? 1 : 0));
+                i.putExtra(COLUMN_TASK_IS_SOLVED, (task.isSolved() ? 1 : 0));
                 startActivity(i);
             }
         });
@@ -167,7 +166,7 @@ public class TasksFragment extends Fragment {
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         Log.d(LOG_TAG, "TasksFragment:onPause");
         super.onPause();
         TaskLab.get(getActivity()).clear();

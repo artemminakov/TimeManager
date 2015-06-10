@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3f638b">
+    android:background="@color/backgroundBodyLight">
 
     <CalendarView
         android:layout_width="match_parent"
@@ -11,7 +11,7 @@
         android:id="@+id/calendarFragment_calendarView"
         android:layout_below="@+id/imageViewMainFragment"
         android:layout_toRightOf="@+id/imageViewMainFragment"
-        android:selectedWeekBackgroundColor="#ff1135ff"
+        android:selectedWeekBackgroundColor="#9ab7ff"
         android:weekNumberColor="#ff5c5960"
         android:weekSeparatorLineColor="#ff5c5960" />
 

@@ -50,14 +50,14 @@ public class DayTimetable {
     }
 
     public void addTask(Task task) {
-        if (mTasks.size() > 14){
+        if (mTasks.size() > 14) {
             return;
         }
         mTasks.add(task);
     }
 
-    public void clear(){
-        if (mTasks.isEmpty()){
+    public void clear() {
+        if (mTasks.isEmpty()) {
             return;
         }
         mTasks.clear();

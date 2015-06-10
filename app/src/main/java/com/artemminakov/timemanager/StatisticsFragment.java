@@ -3,6 +3,7 @@ package com.artemminakov.timemanager;
 import android.app.Fragment;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,7 +50,9 @@ public class StatisticsFragment extends Fragment {
         statisticsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position){
+                ((TextView)parent.getChildAt(0)).setTextColor(Color.BLACK);
+                ((TextView)parent.getChildAt(0)).setTextSize(23);
+                switch (position) {
                     case 0:
                         setZeroStatistics();
                         queryTaskDBHelper(df.format(currDate));
@@ -147,10 +150,10 @@ public class StatisticsFragment extends Fragment {
             }
         }
 
-            c.close();
+        c.close();
     }
 
-    private void setZeroStatistics(){
+    private void setZeroStatistics() {
         countExecuteTask = 0;
         countOverdueTask = 0;
     }

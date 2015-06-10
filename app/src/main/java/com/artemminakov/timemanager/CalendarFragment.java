@@ -7,9 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
-import android.widget.ListView;
-import android.widget.Toast;
-
 
 public class CalendarFragment extends Fragment {
 
@@ -29,7 +26,7 @@ public class CalendarFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.calendar_fragment, null);
-        final CalendarView calendarView = (CalendarView)view.findViewById(R.id.calendarFragment_calendarView);
+        final CalendarView calendarView = (CalendarView) view.findViewById(R.id.calendarFragment_calendarView);
         date = calendarView.getDate();
         calendarView.setShowWeekNumber(false);
         calendarView.setFirstDayOfWeek(2);

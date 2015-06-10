@@ -1,13 +1,7 @@
 package com.artemminakov.timemanager;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 
-public class AddTaskActivity extends Activity{
+public class AddTaskActivity extends Activity {
 
     private String[] priority = {"Низкий", "Средний", "Высокий"};
 
@@ -29,12 +23,12 @@ public class AddTaskActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.add_task_activity);
-        Button addButton = (Button)findViewById(R.id.add_btn_task_AddTaskActivity);
-        final EditText titleEditText = (EditText)findViewById(R.id.title_AddTaskActivity);
-        final EditText quantityHoursEditText = (EditText)findViewById(R.id.quantH_editText_AddTaskActivity);
-        Spinner prioritySpinner = (Spinner)findViewById(R.id.spinner_AddTaskActivity);
+        Button addButton = (Button) findViewById(R.id.add_btn_task_AddTaskActivity);
+        final EditText titleEditText = (EditText) findViewById(R.id.title_AddTaskActivity);
+        final EditText quantityHoursEditText = (EditText) findViewById(R.id.quantH_editText_AddTaskActivity);
+        Spinner prioritySpinner = (Spinner) findViewById(R.id.spinner_AddTaskActivity);
         prioritySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

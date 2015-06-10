@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 public class EditTaskActivity extends Activity {
 
     private static final String[] priority = {"Низкий", "Средний", "Высокий"};
-    final String LOG_TAG = "myLogs";
 
     private static final String taskTitleName = "title";
     private static final String taskQuantityHoursName = "quantityHours";
@@ -38,7 +36,6 @@ public class EditTaskActivity extends Activity {
     private static final String COLUMN_TASK_SPENT_ON_SOLUTION = "spentOnSolution";
 
     private static final String TABLE_TIMETABLESOLVE = "timetableSolve";
-    private static final String COLUMN_TIMETABLESOLVE_DATE = "date";
     private static final String TABLE_TIMETABLE = "timetable";
 
     private String extraPriority;
@@ -54,24 +51,32 @@ public class EditTaskActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.edit_task_activity);
+
         Button editButton = (Button) findViewById(R.id.edit_btn_task_EditTaskActivity);
+
         final EditText titleEditText = (EditText) findViewById(R.id.title_EditTaskActivity);
         titleEditText.setText(getIntent().getStringExtra(taskTitleName));
+
         final EditText quantityHoursEditText = (EditText) findViewById(R.id.quantH_editText_EditTaskActivity);
         extraPriority = getIntent().getStringExtra(taskPriorityName);
+
         quantityHoursEditText.setText(getIntent().getStringExtra(taskQuantityHoursName));
+
         final CheckBox checkBoxSolve = (CheckBox) findViewById(R.id.checkBox_EditTaskActivity);
         checkBoxSolve.setChecked((getIntent().getIntExtra(taskIsSolvedName, 1) != 0));
+
         isExecutedTask = getIntent().getStringExtra(taskExecuted);
+
         TextView checkBoxSolveTitle = (TextView) findViewById(R.id.checkboxTitle_textView_EditTaskActivity);
+
         Button changeButton = (Button) findViewById(R.id.change_task_EditTaskActivity);
-        if (isExecutedTask != null){
+        if (isExecutedTask != null) {
             editButton.setText("Выполнить!");
             changeButton.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             checkBoxSolve.setVisibility(View.VISIBLE);
             checkBoxSolveTitle.setVisibility(View.VISIBLE);
         }
@@ -107,12 +112,11 @@ public class EditTaskActivity extends Activity {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (dateTimetable != null){
+                if (dateTimetable != null) {
                     taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1) + 1;
                     editSolveQueryTaskDBHelper(dateTimetable, taskPositionInTimetable);
                     finish();
-                }
-                else{
+                } else {
                     isSolvedTask = checkBoxSolve.isChecked();
                     editQueryTaskDBHelper(titleEditText.getText().toString(), taskPriority, quantityHoursEditText.getText().toString());
                     finish();
@@ -178,7 +182,6 @@ public class EditTaskActivity extends Activity {
         int spentOnSolution = 0;
 
         Cursor c = db.query(TABLE_TASK, null, null, null, null, null, null);
-        Log.d(LOG_TAG, "--- editSolveQueryTaskDBHelper ---");
 
         if (c.moveToFirst()) {
 
@@ -208,61 +211,19 @@ public class EditTaskActivity extends Activity {
 
         db.update(TABLE_TASK, cvTask, "idTask = ?", new String[]{Integer.toString(editTaskId)});
 
-        Cursor c2 = db.rawQuery("select * from timetableSolve where date = \"" + dateTimetable + "\"", null);
-        if (c2 != null) {
-            if (c2.moveToFirst()) {
-                Log.d(LOG_TAG, "--- TimetableSolve ---");
-                int colIndex1 = c2.getColumnIndex("idTimetableSolve");
-                Log.d(LOG_TAG, "--- 1 ---" + c2.getString(colIndex1));
-                int colIndex2 = c2.getColumnIndex("date");
-                Log.d(LOG_TAG, "--- 2 ---" + c2.getString(colIndex2));
-                int colIndex3 = c2.getColumnIndex("taskId1");
-                Log.d(LOG_TAG, "--- 3 ---" + c2.getString(colIndex3));
-                int colIndex4 = c2.getColumnIndex("taskId2");
-                Log.d(LOG_TAG, "--- 4 ---" + c2.getString(colIndex4));
-                int colIndex5 = c2.getColumnIndex("taskId3");
-                Log.d(LOG_TAG, "--- 5 ---" + c2.getString(colIndex5));
-                int colIndex6 = c2.getColumnIndex("taskId4");
-                Log.d(LOG_TAG, "--- 6 ---" + c2.getString(colIndex6));
-                int colIndex7 = c2.getColumnIndex("taskId5");
-                Log.d(LOG_TAG, "--- 7 ---" + c2.getString(colIndex7));
-                int colIndex8 = c2.getColumnIndex("taskId6");
-                Log.d(LOG_TAG, "--- 8 ---" + c2.getString(colIndex8));
-                int colIndex9 = c2.getColumnIndex("taskId7");
-                Log.d(LOG_TAG, "--- 9 ---" + c2.getString(colIndex9));
-                int colIndex10 = c2.getColumnIndex("taskId8");
-                Log.d(LOG_TAG, "--- 10 ---" + c2.getString(colIndex10));
-                int colIndex11 = c2.getColumnIndex("taskId9");
-                Log.d(LOG_TAG, "--- 11 ---" + c2.getString(colIndex11));
-                int colIndex12 = c2.getColumnIndex("taskId10");
-                Log.d(LOG_TAG, "--- 12 ---" + c2.getString(colIndex12));
-                int colIndex13 = c2.getColumnIndex("taskId11");
-                Log.d(LOG_TAG, "--- 13 ---" + c2.getString(colIndex13));
-                int colIndex14 = c2.getColumnIndex("taskId12");
-                Log.d(LOG_TAG, "--- 14 ---" + c2.getString(colIndex14));
-                int colIndex15 = c2.getColumnIndex("taskId13");
-                Log.d(LOG_TAG, "--- 15 ---" + c2.getString(colIndex15));
-                int colIndex16 = c2.getColumnIndex("taskId14");
-                Log.d(LOG_TAG, "--- 16 ---" + c2.getString(colIndex16));
-                int colIndex17 = c2.getColumnIndex("taskId15");
-                Log.d(LOG_TAG, "--- 17 ---" + c2.getString(colIndex17));
-            }
-        }
-        c2.close();
-
-        cvTimetable.put("taskId" + taskPositionInTimetable , 1);
+        cvTimetable.put("taskId" + taskPositionInTimetable, 1);
 
         db.update(TABLE_TIMETABLESOLVE, cvTimetable, "date = ?", new String[]{dateTimetable});
 
     }
 
-    private void updateTaskDB(String dateTimetable, int taskId){
+    private void updateTaskDB(String dateTimetable, int taskId) {
         taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1) + 1;
         taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
         SQLiteDatabase db = taskDBHelper.getWritableDatabase();
         ContentValues cvTimetable = new ContentValues();
 
-        cvTimetable.put("taskId" + taskPositionInTimetable , taskId);
+        cvTimetable.put("taskId" + taskPositionInTimetable, taskId);
 
         db.update(TABLE_TIMETABLE, cvTimetable, "date = ?", new String[]{dateTimetable});
     }

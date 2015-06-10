@@ -22,21 +22,20 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Calendar now = GregorianCalendar.getInstance();
         taskPriorityH = intent.getStringArrayExtra("taskH");
         taskPriorityHTitle = intent.getStringArrayExtra("taskHTitle");
-        long[] vibrate = {100, 200, 300 };
+        long[] vibrate = {100, 200, 300};
         Resources res = context.getResources();
 
         String str = new SimpleDateFormat("HH").format(Calendar.getInstance().getTime());
         if (taskPriorityH != null) {
             for (int i = 0; i < taskPriorityH.length; i++) {
                 String taskTime;
-                if (taskPriorityH[i] != null){
+                if (taskPriorityH[i] != null) {
                     taskTime = taskPriorityH[i];
                     if (taskPriorityHTitle[i] != null)
                         messageTitle = taskPriorityHTitle[i];
-                }else {
+                } else {
                     continue;
                 }
                 if (str.matches(taskTime)) {

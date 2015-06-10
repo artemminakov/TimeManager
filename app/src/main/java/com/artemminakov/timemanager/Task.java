@@ -78,11 +78,11 @@ public class Task {
         return taskTime[position];
     }
 
-    public void setSpentOnSolution(int spentOnSolution){
+    public void setSpentOnSolution(int spentOnSolution) {
         mSpentOnSolution = spentOnSolution;
     }
 
-    public int getSpentOnSolution(){
+    public int getSpentOnSolution() {
         return mSpentOnSolution;
     }
 

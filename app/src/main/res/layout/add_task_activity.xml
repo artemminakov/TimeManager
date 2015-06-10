@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2a5686"
+    android:background="@color/backgroundBodyLight"
     android:weightSum="1">
 
     <EditText
@@ -15,14 +15,14 @@
         android:layout_marginBottom="10dp"
         android:layout_gravity="center_horizontal"
         android:hint="Название"
-        android:textColorHint="#5af0faff"
-        android:textColor="#fff"
+        android:textColorHint="#939393"
+        android:textColor="#000"
         android:singleLine="false"
         android:background="@android:color/transparent"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textSize="30dp" />
+        android:textSize="27dp" />
 
     <View
         android:layout_width="fill_parent"
@@ -58,8 +58,8 @@
         android:layout_marginTop="5dp"
         android:layout_marginLeft="20dp"
         android:inputType="numberDecimal"
-        android:textColor="#fff"
-        android:textColorHint="#5af0faff" />
+        android:textColor="#000"
+        android:textColorHint="#939393" />
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
@@ -75,11 +75,11 @@
         android:layout_height="wrap_content"
         android:text="Добавить"
         android:id="@+id/add_btn_task_AddTaskActivity"
-        android:background="#224469"
+        android:background="@color/backgroundMain"
         android:layout_marginBottom="20dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:textColor="#5af0faff"
+        android:textColor="#fff"
         android:clickable="false" />
 
     <TextView
@@ -88,7 +88,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Приоритет"
         android:id="@+id/priority_textView_AddTaskActivity"
-        android:textColor="#5af0faff"
+        android:textColor="#939393"
         android:textSize="20dp"
         android:layout_below="@+id/view2_AddTaskActivity"
         android:layout_alignLeft="@+id/quantH_editText_AddTaskActivity"

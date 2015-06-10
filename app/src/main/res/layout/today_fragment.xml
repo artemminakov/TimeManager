@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3f638b">
+    android:background="@color/backgroundBodyLight">
 
     <TextView
         android:layout_width="wrap_content"
@@ -11,8 +11,11 @@
         android:id="@+id/textViewTodayFragmentHeader"
         android:text="Сегодня"
         android:textSize="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
         android:layout_gravity="center_horizontal"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:textStyle="italic" />
 
     <ListView
         android:layout_width="match_parent"
