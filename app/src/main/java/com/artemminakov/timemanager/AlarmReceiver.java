@@ -7,11 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -50,7 +47,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                                     .setTicker(messageTitle)
                                     .setContentTitle(context.getResources().getString(R.string.message_box_title))
                                     .setContentText(messageTitle)
-                                    .setAutoCancel(true);//.setVibrate(vibrate);
+                                    .setAutoCancel(true).setVibrate(vibrate);
                     Intent resultIntent = new Intent(context, MainActivity.class);
                     TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
                     stackBuilder.addParentStack(MainActivity.class);

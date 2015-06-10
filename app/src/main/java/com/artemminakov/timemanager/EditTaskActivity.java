@@ -39,6 +39,7 @@ public class EditTaskActivity extends Activity {
 
     private static final String TABLE_TIMETABLESOLVE = "timetableSolve";
     private static final String COLUMN_TIMETABLESOLVE_DATE = "date";
+    private static final String TABLE_TIMETABLE = "timetable";
 
     private String extraPriority;
     private int selectonPrioritySpinner = 1;
@@ -65,13 +66,24 @@ public class EditTaskActivity extends Activity {
         checkBoxSolve.setChecked((getIntent().getIntExtra(taskIsSolvedName, 1) != 0));
         isExecutedTask = getIntent().getStringExtra(taskExecuted);
         TextView checkBoxSolveTitle = (TextView) findViewById(R.id.checkboxTitle_textView_EditTaskActivity);
+        Button changeButton = (Button) findViewById(R.id.change_task_EditTaskActivity);
         if (isExecutedTask != null){
             editButton.setText("Выполнить!");
+            changeButton.setVisibility(View.VISIBLE);
         }
         else {
             checkBoxSolve.setVisibility(View.VISIBLE);
             checkBoxSolveTitle.setVisibility(View.VISIBLE);
         }
+
+        changeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), AddTaskToDayTimetableActivity.class);
+                startActivityForResult(i, 0);
+            }
+        });
+
         dateTimetable = getIntent().getStringExtra(timetableDate);
         Spinner prioritySpinner = (Spinner) findViewById(R.id.spinner_EditTaskActivity);
         for (int i = 0; i < priority.length; i++) {
@@ -107,6 +119,18 @@ public class EditTaskActivity extends Activity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {
+            return;
+        }
+        int taskResId;
+        taskResId = Integer.parseInt(data.getStringExtra("taskId"));
+        dateTimetable = getIntent().getStringExtra(timetableDate);
+        updateTaskDB(dateTimetable, taskResId);
+        finish();
     }
 
     private void editQueryTaskDBHelper(String titleTask, String priorityTask, String quantityHoursTask) {
@@ -174,14 +198,6 @@ public class EditTaskActivity extends Activity {
         Cursor c1 = db.rawQuery("select * from task where idTask = \"" + editTaskId + "\"", null);
         if (c1 != null) {
             if (c1.moveToFirst()) {
-                /*int titleColIndex = c1.getColumnIndex(COLUMN_TASK_TITLE);
-                Log.d(LOG_TAG, "--- Task title ---" + c1.getString(titleColIndex));
-                int priorityColIndex = c1.getColumnIndex(COLUMN_TASK_PRIORITY);
-                Log.d(LOG_TAG, "--- Task priority ---" + c1.getString(priorityColIndex));
-                int quantityHColIndex = c1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
-                Log.d(LOG_TAG, "--- Task quantity hours ---" + c1.getInt(quantityHColIndex));
-                int isSolvedColIndex = c1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
-                Log.d(LOG_TAG, "--- Task is solved ---" + c1.getInt(isSolvedColIndex));*/
                 int toSolveHours = c1.getColumnIndex(COLUMN_TASK_SPENT_ON_SOLUTION);
                 spentOnSolution = c1.getInt(toSolveHours) + 1;
             }
@@ -238,6 +254,17 @@ public class EditTaskActivity extends Activity {
 
         db.update(TABLE_TIMETABLESOLVE, cvTimetable, "date = ?", new String[]{dateTimetable});
 
+    }
+
+    private void updateTaskDB(String dateTimetable, int taskId){
+        taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1) + 1;
+        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
+        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
+        ContentValues cvTimetable = new ContentValues();
+
+        cvTimetable.put("taskId" + taskPositionInTimetable , taskId);
+
+        db.update(TABLE_TIMETABLE, cvTimetable, "date = ?", new String[]{dateTimetable});
     }
 
 }

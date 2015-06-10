@@ -119,5 +119,17 @@
         android:layout_marginLeft="75dp"
         android:layout_marginTop="10dp"/>
 
+    <Button
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Изменить"
+        android:id="@+id/change_task_EditTaskActivity"
+        android:layout_below="@+id/checkBox_EditTaskActivity"
+        android:background="#224469"
+        android:layout_marginBottom="20dp"
+        android:layout_centerHorizontal="true"
+        android:textColor="#5af0faff"
+        android:visibility="gone"/>
+
 
 </RelativeLayout>
