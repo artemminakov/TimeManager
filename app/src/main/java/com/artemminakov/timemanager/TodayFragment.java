@@ -33,6 +33,7 @@ public class TodayFragment extends Fragment {
     private static String[] taskTime = {"08", "09", "10", "11", "12", "13", "14", "15", "16", "17",
             "18", "19", "20", "21", "22"};
     private static String[] taskTimePriorityH = new String[15];
+    private static String[] taskTimePriorityHTitle = new String[15];
     private int positionInTaskTimePriorityH = 0;
 
     private static final String COLUMN_TASK_TITLE = "title";
@@ -164,8 +165,10 @@ public class TodayFragment extends Fragment {
                                     int temp = c.getColumnIndex(cn)-2;
                                     if (var.matches("Высокий")){
                                         if (temp < 15 && positionInTaskTimePriorityH < 15) {
-                                            taskTimePriorityH[positionInTaskTimePriorityH++] =
+                                            taskTimePriorityH[positionInTaskTimePriorityH] =
                                                     taskTime[temp];
+                                            taskTimePriorityHTitle[positionInTaskTimePriorityH++] =
+                                                    c1.getString(titleColIndex);
                                         }
                                     }
                                     resTask.setTitle(c1.getString(titleColIndex));
@@ -214,8 +217,9 @@ public class TodayFragment extends Fragment {
     private void handleNotification() {
         Intent alarmIntent = new Intent(getActivity(), AlarmReceiver.class);
         alarmIntent.putExtra("taskH", taskTimePriorityH);
+        alarmIntent.putExtra("taskHTitle", taskTimePriorityHTitle);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) this.getActivity().getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5000, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
     }
 }

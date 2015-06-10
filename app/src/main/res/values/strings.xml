@@ -5,8 +5,8 @@
     <string name="tasks_title">Tasks</string>
     <string name="action_settings">Settings</string>
     <string name="delete_task">Удалить</string>
-    <string name="message_box_title">Title</string>
-    <string name="message_timesheet_not_up_to_date">Message</string>
+    <string name="message_box_title">Важная задача</string>
+    <string name="message_timesheet_not_up_to_date"></string>
     <string-array name="items_array">
         <item>Главная</item>
         <item>Сегодня</item>
