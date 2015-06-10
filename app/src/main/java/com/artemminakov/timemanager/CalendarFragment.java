@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 
 public class CalendarFragment extends Fragment {
@@ -15,6 +16,8 @@ public class CalendarFragment extends Fragment {
     private String yearCalendarView = "year";
     private String monthCalendarView = "month";
     private String dayOfMonthCalendarView = "day";
+    private long date;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,16 +29,22 @@ public class CalendarFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.calendar_fragment, null);
-        CalendarView calendarView = (CalendarView)view.findViewById(R.id.calendarFragment_calendarView);
+        final CalendarView calendarView = (CalendarView)view.findViewById(R.id.calendarFragment_calendarView);
+        date = calendarView.getDate();
+        calendarView.setShowWeekNumber(false);
+        calendarView.setFirstDayOfWeek(2);
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 
             @Override
-            public void onSelectedDayChange(CalendarView calendView, int year, int month, int dayOfMonth) {
+            public void onSelectedDayChange(CalendarView calendarView1, int year, int month, int dayOfMonth) {
                 Intent i = new Intent(getActivity().getApplicationContext(), AddTimetableOnDataActivity.class);
                 i.putExtra(yearCalendarView, year);
                 i.putExtra(monthCalendarView, month);
                 i.putExtra(dayOfMonthCalendarView, dayOfMonth);
-                startActivity(i);
+                if (calendarView.getDate() != date) {
+                    date = calendarView.getDate();
+                    startActivity(i);
+                }
             }
         });
 

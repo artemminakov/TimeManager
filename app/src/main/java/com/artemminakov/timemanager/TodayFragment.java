@@ -1,17 +1,13 @@
 package com.artemminakov.timemanager;
 
+import android.app.AlarmManager;
 import android.app.Fragment;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +20,6 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 
@@ -35,6 +30,10 @@ public class TodayFragment extends Fragment {
     private boolean[] tasksSolve = new boolean[15];
     private int positionInTaskSolve = 0;
     final String LOG_TAG = "myLogs";
+    private static String[] taskTime = {"08", "09", "10", "11", "12", "13", "14", "15", "16", "17",
+            "18", "19", "20", "21", "22"};
+    private static String[] taskTimePriorityH = new String[15];
+    private int positionInTaskTimePriorityH = 0;
 
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
@@ -48,7 +47,6 @@ public class TodayFragment extends Fragment {
     private static final String taskExecuted = "executed";
     private static final String timetableDate = "timetableDate";
     private static final String taskPosition = "taskPosition";
-    private static final int NOTIFY_ID = 101;
 
     private DateFormat df = new SimpleDateFormat("dd.M.yyyy");
     private Date currDate = new Date();
@@ -89,7 +87,6 @@ public class TodayFragment extends Fragment {
 
 
         View view = inflater.inflate(R.layout.today_fragment, null);
-        notificationImportantTask();
         final ListView lvMain = (ListView) view.findViewById(R.id.listViewSchedule);
 
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -135,6 +132,7 @@ public class TodayFragment extends Fragment {
         ListView listView = (ListView) this.getActivity().findViewById(R.id.listViewSchedule);
         TaskAdapter adapter = new TaskAdapter(mTasks);
         listView.setAdapter(adapter);
+        handleNotification();
     }
 
 
@@ -143,8 +141,6 @@ public class TodayFragment extends Fragment {
         SQLiteDatabase db = taskDBHelper.getWritableDatabase();
 
         String sqlQuery = "select * from timetable where date = \"" + date + "\"";
-        Log.d(LOG_TAG, "--- Insert in mytable: ---" + date);
-
 
         Cursor c = db.rawQuery(sqlQuery, null);
         if (c != null) {
@@ -164,6 +160,14 @@ public class TodayFragment extends Fragment {
                                     int quantityHColIndex = c1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
                                     int isSolvedColIndex = c1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
                                     Task resTask = new Task();
+                                    String var = c1.getString(priorityColIndex);
+                                    int temp = c.getColumnIndex(cn)-2;
+                                    if (var.matches("Высокий")){
+                                        if (temp < 15 && positionInTaskTimePriorityH < 15) {
+                                            taskTimePriorityH[positionInTaskTimePriorityH++] =
+                                                    taskTime[temp];
+                                        }
+                                    }
                                     resTask.setTitle(c1.getString(titleColIndex));
                                     resTask.setPriority(c1.getString(priorityColIndex));
                                     resTask.setNumberOfHoursToSolve(c1.getInt(quantityHColIndex));
@@ -207,37 +211,11 @@ public class TodayFragment extends Fragment {
         positionInTaskSolve = 0;
     }
 
-    private void notificationImportantTask(){
-        Context context = getActivity().getApplicationContext();
-
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context,
-                0, notificationIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-
-        Resources res = context.getResources();
-        Notification.Builder builder = new Notification.Builder(context);
-        String str = new SimpleDateFormat("HH:mm").format(Calendar.getInstance().getTime());
-
-        builder.setContentIntent(contentIntent)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.ic_drawer))
-                        //.setTicker(res.getString(R.string.warning)) // текст в строке состояния
-                .setTicker("Важная задача!!!")
-                .setWhen(System.currentTimeMillis())
-                .setAutoCancel(true)
-                        //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
-                .setContentTitle("Напоминание")
-                        //.setContentText(res.getString(R.string.notifytext))
-                .setContentText("Делай дело!"); // Текст уведомленимя
-
-        // Notification notification = builder.getNotification(); // до API 16
-        //if(str.matches("01:25")) {
-            Notification notification = builder.getNotification();
-
-            NotificationManager notificationManager = (NotificationManager) context
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(NOTIFY_ID, notification);
-       // }
+    private void handleNotification() {
+        Intent alarmIntent = new Intent(getActivity(), AlarmReceiver.class);
+        alarmIntent.putExtra("taskH", taskTimePriorityH);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) this.getActivity().getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5000, pendingIntent);
     }
 }
