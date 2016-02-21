@@ -16,7 +16,7 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        db.execSQL("create table task (idTask integer primary key autoincrement, title text, priority text, " +
+        db.execSQL("create table tasks (idTask integer primary key autoincrement, title text, priority text, " +
                 "quantityHours integer, isSolved integer, spentOnSolution integer);");
 
         db.execSQL("create table timetable (idTimetable integer primary key autoincrement, date text, taskId1 integer, " +

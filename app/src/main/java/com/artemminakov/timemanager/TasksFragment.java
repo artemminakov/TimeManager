@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +29,8 @@ public class TasksFragment extends Fragment {
     private int taskQuantityHours;
     final String LOG_TAG = "myLogs";
 
-    private static final String TABLE_TASK = "task";
+    private static final String TABLE_TASK = "tasks";
+    private static final String COLUMN_TASK_ID = "idTask";
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
@@ -82,26 +82,6 @@ public class TasksFragment extends Fragment {
         }
     }
 
-    /*@Override
-    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo){
-        getActivity().getMenuInflater().inflate(R.menu.task_list_item_context, menu);
-    }*/
-
-    /*@Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        int position = info.position;
-        TaskAdapter adapter = new TaskAdapter(mTasks);
-        Task task = adapter.getItem(position);
-        switch (item.getItemId()) {
-            case R.id.menu_item_delete_task:
-                TaskLab.get(getActivity()).deleteTask(task);
-                adapter.notifyDataSetChanged();
-                return true;
-        }
-        return super.onContextItemSelected(item);
-    }*/
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -113,6 +93,10 @@ public class TasksFragment extends Fragment {
         registerForContextMenu(lvMain);
         setHasOptionsMenu(true);
 
+        if (isNotCreateTasks()){
+            Task task = new Task(" ", "Средний", 5, false);
+            addTaskToDatabase(task);
+        }
 
         lvMain.setOnItemClickListener(new OnItemClickListener() {
             @Override
@@ -173,19 +157,22 @@ public class TasksFragment extends Fragment {
     }
 
     private void queryTaskDBHelper() {
-        taskDBHelper = new TaskDatabaseHelper(getActivity().getApplicationContext());
         SQLiteDatabase db = taskDBHelper.getWritableDatabase();
 
         Cursor c = db.query(TABLE_TASK, null, null, null, null, null, null);
 
         if (c.moveToFirst()) {
 
+            int idTask = c.getColumnIndex(COLUMN_TASK_ID);
             int titleColIndex = c.getColumnIndex(COLUMN_TASK_TITLE);
             int priorityColIndex = c.getColumnIndex(COLUMN_TASK_PRIORITY);
             int quantityHColIndex = c.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
             int isSolvedColIndex = c.getColumnIndex(COLUMN_TASK_IS_SOLVED);
 
             do {
+                if (c.getString(idTask).equals("1")) {
+                    continue;
+                }
                 Task resTask = new Task();
                 resTask.setTitle(c.getString(titleColIndex));
                 resTask.setPriority(c.getString(priorityColIndex));
@@ -208,4 +195,18 @@ public class TasksFragment extends Fragment {
         db.insert(TABLE_TASK, null, cv);
     }
 
+    private boolean isNotCreateTasks(){
+        taskDBHelper = new TaskDatabaseHelper(getActivity().getApplicationContext());
+        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
+        Cursor cursor = taskDB.rawQuery("select * from tasks where idTask = \"" + "1" + "\"", null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                cursor.close();
+                return false;
+            }
+        }
+
+        cursor.close();
+        return true;
+    }
 }

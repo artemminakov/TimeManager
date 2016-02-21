@@ -9,8 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,22 +44,8 @@ public class AddTimetableOnDataActivity extends Activity {
 
     private static final String TABLE_TIMETABLE = "timetable";
     private static final String COLUMN_TIMETABLE_DATE = "date";
-    private static final String COLUMN_TIMETABLE_TASKID1 = "taskId1";
-    private static final String COLUMN_TIMETABLE_TASKID2 = "taskId2";
-    private static final String COLUMN_TIMETABLE_TASKID3 = "taskId3";
-    private static final String COLUMN_TIMETABLE_TASKID4 = "taskId4";
-    private static final String COLUMN_TIMETABLE_TASKID5 = "taskId5";
-    private static final String COLUMN_TIMETABLE_TASKID6 = "taskId6";
-    private static final String COLUMN_TIMETABLE_TASKID7 = "taskId7";
-    private static final String COLUMN_TIMETABLE_TASKID8 = "taskId8";
-    private static final String COLUMN_TIMETABLE_TASKID9 = "taskId9";
-    private static final String COLUMN_TIMETABLE_TASKID10 = "taskId10";
-    private static final String COLUMN_TIMETABLE_TASKID11 = "taskId11";
-    private static final String COLUMN_TIMETABLE_TASKID12 = "taskId12";
-    private static final String COLUMN_TIMETABLE_TASKID13 = "taskId13";
-    private static final String COLUMN_TIMETABLE_TASKID14 = "taskId14";
-    private static final String COLUMN_TIMETABLE_TASKID15 = "taskId15";
-
+    private static final String[] COLUMN_TIMETABLE_TASKS = {"taskId1", "taskId2", "taskId3", "taskId4", "taskId5", "taskId6", "taskId7",
+                                             "taskId8", "taskId9", "taskId10", "taskId11", "taskId12", "taskId13", "taskId14", "taskId15"};
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
@@ -101,17 +85,10 @@ public class AddTimetableOnDataActivity extends Activity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.task_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
+        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "onCreate()");
-        // getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.add_timetable_on_data_activity);
         year = getIntent().getIntExtra(yearCalendarView, 2015);
         month = getIntent().getIntExtra(monthCalendarView, 1);
@@ -125,6 +102,7 @@ public class AddTimetableOnDataActivity extends Activity {
             dateTimetableTitle.append(0);
         }
         dateTimetable.append(month + 1).append(".").append(year);
+        addTaskToDatabase(dateTimetable.toString());
         dateTimetableTitle.append(month + 1).append(".").append(year);
         TextView titleTextView = (TextView) findViewById(R.id.textViewHeaderAddTimetableOnData);
         StringBuilder title = new StringBuilder();
@@ -180,7 +158,6 @@ public class AddTimetableOnDataActivity extends Activity {
         int taskResId;
         taskResId = Integer.parseInt(data.getStringExtra("taskId"));
         taskIds[positionInTasksIds] = taskResId;
-        addTaskToDatabase(dateTimetable.toString());
     }
 
     @Override
@@ -208,57 +185,54 @@ public class AddTimetableOnDataActivity extends Activity {
     }
 
     private void queryTaskDBHelper(String date) {
-        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
-        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
+        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
 
         String sqlQuery = "select * from timetable where date = \"" + date + "\"";
 
         Log.d(LOG_TAG, "Date = " + date);
 
-        Cursor c = db.rawQuery(sqlQuery, null);
-        if (c != null) {
-            if (c.moveToFirst()) {
-                StringBuilder sb = new StringBuilder();
+        Cursor cursor = taskDB.rawQuery(sqlQuery, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
                 do {
-                    sb.setLength(0);
-                    for (String cn : c.getColumnNames()) {
+                    for (String cn : cursor.getColumnNames()) {
                         if (cn.matches("idTimetable") || cn.matches("date")) {
                             continue;
                         } else {
-                            Cursor c1 = db.rawQuery("select * from task where idTask = \"" + c.getString(c.getColumnIndex(cn)) + "\"", null);
-                            if (c1 != null) {
-                                if (c1.moveToFirst()) {
-                                    int titleColIndex = c1.getColumnIndex(COLUMN_TASK_TITLE);
-                                    int priorityColIndex = c1.getColumnIndex(COLUMN_TASK_PRIORITY);
-                                    int quantityHColIndex = c1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
-                                    int isSolvedColIndex = c1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
+                            Cursor cursor1 = taskDB.rawQuery("select * from tasks where idTask = \"" + cursor.getString(cursor.getColumnIndex(cn)) + "\"", null);
+                            if (cursor1 != null) {
+                                if (cursor1.moveToFirst()) {
+                                    int titleColIndex = cursor1.getColumnIndex(COLUMN_TASK_TITLE);
+                                    int priorityColIndex = cursor1.getColumnIndex(COLUMN_TASK_PRIORITY);
+                                    int quantityHColIndex = cursor1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
+                                    int isSolvedColIndex = cursor1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
                                     Task resTask = new Task();
-                                    resTask.setTitle(c1.getString(titleColIndex));
-                                    resTask.setPriority(c1.getString(priorityColIndex));
-                                    resTask.setNumberOfHoursToSolve(c1.getInt(quantityHColIndex));
-                                    resTask.setIsSolved((c1.getInt(isSolvedColIndex) != 0));
+                                    resTask.setTitle(cursor1.getString(titleColIndex));
+                                    resTask.setPriority(cursor1.getString(priorityColIndex));
+                                    resTask.setNumberOfHoursToSolve(cursor1.getInt(quantityHColIndex));
+                                    resTask.setIsSolved((cursor1.getInt(isSolvedColIndex) != 0));
                                     DayTimetable.get(getApplicationContext()).addTask(resTask);
                                 }
                             }
-                            c1.close();
+                            cursor1.close();
                         }
                     }
-                } while (c.moveToNext());
+                } while (cursor.moveToNext());
             }
         }
 
-        c.close();
+        cursor.close();
 
-        Cursor c2 = db.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
-        if (c2 != null) {
-            if (c2.moveToFirst()) {
+        Cursor cursor2 = taskDB.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
+        if (cursor2 != null) {
+            if (cursor2.moveToFirst()) {
                 do {
-                    for (String cn : c2.getColumnNames()) {
+                    for (String cn : cursor2.getColumnNames()) {
                         if (cn.matches("idTimetableSolve") || cn.matches("date")) {
                             continue;
                         } else {
-                            int isSolvedColIndex = c2.getColumnIndex(cn);
-                            boolean isSolved = (c2.getInt(isSolvedColIndex) != 0);
+                            int isSolvedColIndex = cursor2.getColumnIndex(cn);
+                            boolean isSolved = (cursor2.getInt(isSolvedColIndex) != 0);
                             if (positionInTaskSolve < tasksSolve.length) {
                                 if (isSolved) {
                                     tasksSolve[positionInTaskSolve++] = true;
@@ -268,69 +242,87 @@ public class AddTimetableOnDataActivity extends Activity {
                             }
                         }
                     }
-                } while (c2.moveToNext());
+                } while (cursor2.moveToNext());
             }
         }
 
-        c2.close();
+        cursor2.close();
         positionInTaskSolve = 0;
     }
 
     private void addTaskToDatabase(String date) {
         ContentValues cvTimetable = new ContentValues();
         ContentValues cvSolve = new ContentValues();
-        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
-        cvTimetable.put(COLUMN_TIMETABLE_DATE, date);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID1, taskIds[0]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID2, taskIds[1]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID3, taskIds[2]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID4, taskIds[3]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID5, taskIds[4]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID6, taskIds[5]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID7, taskIds[6]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID8, taskIds[7]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID9, taskIds[8]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID10, taskIds[9]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID11, taskIds[10]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID12, taskIds[11]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID13, taskIds[12]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID14, taskIds[13]);
-        cvTimetable.put(COLUMN_TIMETABLE_TASKID15, taskIds[14]);
-        db.insert(TABLE_TIMETABLE, null, cvTimetable);
+        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
 
-        if (isCreateTableSolve(date)) {
+        if (isNotCreateTableTimetable(date)) {
+            cvTimetable.put(COLUMN_TIMETABLE_DATE, date);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[0], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[1], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[2], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[3], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[4], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[5], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[6], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[7], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[8], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[9], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[10], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[11], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[12], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[13], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[14], 1);
+
+            taskDB.insert(TABLE_TIMETABLE, null, cvTimetable);
+        }
+
+        if (isNotCreateTableSolve(date)) {
             cvSolve.put(COLUMN_TIMETABLE_DATE, date);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID1, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID2, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID3, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID4, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID5, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID6, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID7, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID8, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID9, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID10, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID11, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID12, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID13, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID14, 0);
-            cvSolve.put(COLUMN_TIMETABLE_TASKID15, 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[0], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[1], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[2], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[3], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[4], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[5], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[6], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[7], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[8], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[9], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[10], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[11], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[12], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[13], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[14], 0);
 
-            db.insert(TABLE_TIMETABLESOLVE, null, cvSolve);
+            taskDB.insert(TABLE_TIMETABLESOLVE, null, cvSolve);
         }
     }
 
-    private boolean isCreateTableSolve(String date) {
-        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
-        Cursor c2 = db.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
-        if (c2 != null) {
-            if (c2.moveToFirst()) {
-                c2.close();
+    private boolean isNotCreateTableSolve(String date) {
+        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
+        Cursor cursor = taskDB.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                cursor.close();
                 return false;
             }
         }
 
-        c2.close();
+        cursor.close();
+        return true;
+    }
+
+    private boolean isNotCreateTableTimetable(String date){
+        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
+        Cursor cursor = taskDB.rawQuery("select * from timetable where date = \"" + date + "\"", null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                cursor.close();
+                return false;
+            }
+        }
+
+        cursor.close();
         return true;
     }
 }

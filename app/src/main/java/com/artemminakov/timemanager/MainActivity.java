@@ -66,7 +66,6 @@ public class MainActivity extends FragmentActivity {
     private CharSequence mTitle;
     private String[] mItemTitles;
 
-    private static MainFragment fragmentMain;
     private static TodayFragment todayFragment;
     private static CalendarFragment calendarFragment;
     private static TasksFragment tasksFragment;
@@ -85,7 +84,6 @@ public class MainActivity extends FragmentActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         myFragmentManager = getFragmentManager();
-        fragmentMain = new MainFragment();
         todayFragment = new TodayFragment();
         calendarFragment = new CalendarFragment();
         tasksFragment = new TasksFragment();
@@ -247,32 +245,25 @@ public class MainActivity extends FragmentActivity {
                 case 0:
                     fragmentTransaction = myFragmentManager
                             .beginTransaction();
-                    fragmentTransaction.replace(R.id.content_frame, fragmentMain,
+                    fragmentTransaction.replace(R.id.content_frame, todayFragment,
                             TAG_1);
                     fragmentTransaction.commit();
                     break;
                 case 1:
                     fragmentTransaction = myFragmentManager
                             .beginTransaction();
-                    fragmentTransaction.replace(R.id.content_frame, todayFragment,
+                    fragmentTransaction.replace(R.id.content_frame, calendarFragment,
                             TAG_1);
                     fragmentTransaction.commit();
                     break;
                 case 2:
                     fragmentTransaction = myFragmentManager
                             .beginTransaction();
-                    fragmentTransaction.replace(R.id.content_frame, calendarFragment,
-                            TAG_1);
-                    fragmentTransaction.commit();
-                    break;
-                case 3:
-                    fragmentTransaction = myFragmentManager
-                            .beginTransaction();
                     fragmentTransaction.replace(R.id.content_frame, tasksFragment,
                             TAG_1);
                     fragmentTransaction.commit();
                     break;
-                case 4:
+                case 3:
                     fragmentTransaction = myFragmentManager
                             .beginTransaction();
                     fragmentTransaction.replace(R.id.content_frame, statisticsFragment,
@@ -282,7 +273,7 @@ public class MainActivity extends FragmentActivity {
                 default:
                     fragmentTransaction = myFragmentManager
                             .beginTransaction();
-                    fragmentTransaction.replace(R.id.content_frame, fragmentMain,
+                    fragmentTransaction.replace(R.id.content_frame, todayFragment,
                             TAG_1);
                     fragmentTransaction.commit();
                     break;

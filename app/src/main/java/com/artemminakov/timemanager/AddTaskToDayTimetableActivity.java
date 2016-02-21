@@ -20,7 +20,7 @@ public class AddTaskToDayTimetableActivity extends Activity {
 
     private ArrayList<Task> mTasks;
 
-    private static final String TABLE_TASK = "task";
+    private static final String TABLE_TASK = "tasks";
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
