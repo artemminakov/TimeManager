@@ -47,11 +47,14 @@ public class EditTaskActivity extends Activity {
     private int taskPositionInTimetable;
 
     private TaskDatabaseHelper taskDBHelper;
+    private SQLiteDatabase tasksDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
+        tasksDB = taskDBHelper.getWritableDatabase();
         //getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.edit_task_activity);
 
@@ -74,13 +77,30 @@ public class EditTaskActivity extends Activity {
 
         TextView checkBoxSolveTitle = (TextView) findViewById(R.id.checkboxTitle_textView_EditTaskActivity);
 
+        Spinner prioritySpinner = (Spinner) findViewById(R.id.spinner_EditTaskActivity);
+
+        TextView priorityTV = (TextView) findViewById(R.id.priority_textView_EditTaskActivity);
+
+        dateTimetable = getIntent().getStringExtra(timetableDate);
+        for (int i = 0; i < priority.length; i++) {
+            if (priority[i].equals(extraPriority)) {
+                selectonPrioritySpinner = i;
+                break;
+            }
+        }
+
         Button changeButton = (Button) findViewById(R.id.change_task_EditTaskActivity);
         if (isExecutedTask != null) {
             editButton.setText("Выполнить!");
             changeButton.setVisibility(View.VISIBLE);
+            priorityTV.setText("Приоритет - " + priority[selectonPrioritySpinner]);
+
         } else {
             checkBoxSolve.setVisibility(View.VISIBLE);
             checkBoxSolveTitle.setVisibility(View.VISIBLE);
+            titleEditText.setFocusableInTouchMode(true);
+            quantityHoursEditText.setFocusableInTouchMode(true);
+            prioritySpinner.setVisibility(View.VISIBLE);
         }
 
         changeButton.setOnClickListener(new View.OnClickListener() {
@@ -91,14 +111,6 @@ public class EditTaskActivity extends Activity {
             }
         });
 
-        dateTimetable = getIntent().getStringExtra(timetableDate);
-        Spinner prioritySpinner = (Spinner) findViewById(R.id.spinner_EditTaskActivity);
-        for (int i = 0; i < priority.length; i++) {
-            if (priority[i].equals(extraPriority)) {
-                selectonPrioritySpinner = i;
-                break;
-            }
-        }
         prioritySpinner.setSelection(selectonPrioritySpinner);
         prioritySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -111,15 +123,23 @@ public class EditTaskActivity extends Activity {
                 taskPriority = priority[0];
             }
         });
+
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (dateTimetable != null) {
-                    editSolveQueryTaskDBHelper(dateTimetable);
+                    String editTaskTitle = getIntent().getStringExtra(taskTitleName);
+                    TaskDatabaseHelper.queryEditSolveTask(dateTimetable, editTaskTitle, taskPositionInTimetable, tasksDB);
                     finish();
                 } else {
                     isSolvedTask = checkBoxSolve.isChecked();
-                    editQueryTaskDBHelper(titleEditText.getText().toString(), taskPriority, quantityHoursEditText.getText().toString());
+                    String editTaskTitle = getIntent().getStringExtra(taskTitleName);
+                    Task task = new Task();
+                    task.setIsSolved(isSolvedTask);
+                    task.setTitle(titleEditText.getText().toString());
+                    task.setPriority(taskPriority);
+                    task.setNumberOfHoursToSolve(Integer.parseInt(quantityHoursEditText.getText().toString()));
+                    TaskDatabaseHelper.queryEditTask(task, editTaskTitle, tasksDB);
                     finish();
                 }
             }
@@ -132,93 +152,14 @@ public class EditTaskActivity extends Activity {
             return;
         }
         int taskResId;
-        taskResId = Integer.parseInt(data.getStringExtra("taskId"));
+        taskResId = data.getIntExtra("taskId", 1);
         dateTimetable = getIntent().getStringExtra(timetableDate);
-        updateTaskDB(dateTimetable, taskResId);
+        taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1) + 1;
+        TaskDatabaseHelper.queryUpdateTask(dateTimetable, taskResId, taskPositionInTimetable, tasksDB);
         finish();
     }
 
-    private void editQueryTaskDBHelper(String titleTask, String priorityTask, String quantityHoursTask) {
-        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
-        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-
-        String editTaskTitle = getIntent().getStringExtra(taskTitleName);
-        int editTaskId = 1;
-
-        Cursor c = db.query(TABLE_TASK, null, null, null, null, null, null);
-
-        if (c.moveToFirst()) {
-
-            int idColIndex = c.getColumnIndex(COLUMN_TASK_ID);
-            int titleColIndex = c.getColumnIndex(COLUMN_TASK_TITLE);
-
-            do {
-                String edit = (c.getString(titleColIndex));
-                if (editTaskTitle.equals(edit)) {
-                    editTaskId = c.getInt(idColIndex);
-                    break;
-                }
-            } while (c.moveToNext());
-        }
-        c.close();
-
-        cv.put(COLUMN_TASK_TITLE, titleTask);
-        cv.put(COLUMN_TASK_PRIORITY, priorityTask);
-        cv.put(COLUMN_TASK_QUANTITY_HOURS, Integer.parseInt(quantityHoursTask));
-        cv.put(COLUMN_TASK_IS_SOLVED, (isSolvedTask ? 1 : 0));
-
-        db.update(TABLE_TASK, cv, "idTask = ?", new String[]{Integer.toString(editTaskId)});
-
-    }
-
-    private void editSolveQueryTaskDBHelper(String dateTimetable) {
-        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
-        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
-        ContentValues cvTask = new ContentValues();
-        ContentValues cvTimetable = new ContentValues();
-
-        String editTaskTitle = getIntent().getStringExtra(taskTitleName);
-        int editTaskId = 1;
-        int spentOnSolution = 0;
-
-        Cursor c = db.query(TABLE_TASK, null, null, null, null, null, null);
-
-        if (c.moveToFirst()) {
-
-            int idColIndex = c.getColumnIndex(COLUMN_TASK_ID);
-            int titleColIndex = c.getColumnIndex(COLUMN_TASK_TITLE);
-
-            do {
-                String edit = (c.getString(titleColIndex));
-                if (editTaskTitle.equals(edit)) {
-                    editTaskId = c.getInt(idColIndex);
-                    break;
-                }
-            } while (c.moveToNext());
-        }
-        c.close();
-
-        Cursor c1 = db.rawQuery("select * from tasks where idTask = \"" + editTaskId + "\"", null);
-        if (c1 != null) {
-            if (c1.moveToFirst()) {
-                int toSolveHours = c1.getColumnIndex(COLUMN_TASK_SPENT_ON_SOLUTION);
-                spentOnSolution = c1.getInt(toSolveHours) + 1;
-            }
-        }
-        c1.close();
-
-        cvTask.put(COLUMN_TASK_SPENT_ON_SOLUTION, spentOnSolution);
-
-        db.update(TABLE_TASK, cvTask, "idTask = ?", new String[]{Integer.toString(editTaskId)});
-
-        cvTimetable.put("taskId" + taskPositionInTimetable, 1);
-
-        db.update(TABLE_TIMETABLESOLVE, cvTimetable, "date = ?", new String[]{dateTimetable});
-
-    }
-
-    private void updateTaskDB(String dateTimetable, int taskId) {
+    /*private void updateTaskDB(String dateTimetable, int taskId) {
         taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1) + 1;
         taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
         SQLiteDatabase db = taskDBHelper.getWritableDatabase();
@@ -227,6 +168,6 @@ public class EditTaskActivity extends Activity {
         cvTimetable.put("taskId" + taskPositionInTimetable, taskId);
 
         db.update(TABLE_TIMETABLE, cvTimetable, "date = ?", new String[]{dateTimetable});
-    }
+    }*/
 
 }

@@ -15,21 +15,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class AddTaskToDayTimetableActivity extends Activity {
 
     private ArrayList<Task> mTasks;
 
-    private static final String TABLE_TASK = "tasks";
-    private static final String COLUMN_TASK_ID = "idTask";
-    private static final String COLUMN_TASK_TITLE = "title";
-    private static final String COLUMN_TASK_PRIORITY = "priority";
-    private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
-    private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
-    final String LOG_TAG = "myLogs";
+    private final String LOG_TAG = "myLogs";
 
-    TaskDatabaseHelper taskDBHelper;
+    private TaskDatabaseHelper taskDBHelper;
+    private SQLiteDatabase taskDB;
 
 
     public class TaskAdapter extends ArrayAdapter<Task> {
@@ -64,15 +60,18 @@ public class AddTaskToDayTimetableActivity extends Activity {
         mTasks = TaskLab.get(this).getTasks();
         final ListView listVievTasks = (ListView) findViewById(R.id.listViewTasks_AddToDay);
         Log.d(LOG_TAG, "In AddTaskToDayTimetable.class");
+        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
+        taskDB = taskDBHelper.getWritableDatabase();
 
         listVievTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Task task = (Task) listVievTasks.getItemAtPosition(position);
                 Intent intent = new Intent();
                 StringBuilder taskPosition = new StringBuilder();
                 taskPosition.append(position + 2);
                 Log.d(LOG_TAG, "Task position " + taskPosition.toString());
-                intent.putExtra("taskId", taskPosition.toString());
+                intent.putExtra("taskId", TaskDatabaseHelper.queryTaskId(task.getTitle(), taskDB));
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -83,8 +82,9 @@ public class AddTaskToDayTimetableActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
-        queryTaskDBHelper();
+        TaskDatabaseHelper.queryGetTasks(taskDB, getApplicationContext());
         ListView listViewTasks = (ListView) findViewById(R.id.listViewTasks_AddToDay);
+        Collections.reverse(mTasks);
         TaskAdapter taskAdapter = new TaskAdapter(mTasks);
         listViewTasks.setAdapter(taskAdapter);
     }
@@ -101,32 +101,4 @@ public class AddTaskToDayTimetableActivity extends Activity {
         TaskLab.get(this).clear();
     }
 
-    private void queryTaskDBHelper() {
-        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
-        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
-
-        Cursor cursor = taskDB.query(TABLE_TASK, null, null, null, null, null, null);
-
-        if (cursor.moveToFirst()) {
-
-            int idTask = cursor.getColumnIndex(COLUMN_TASK_ID);
-            int titleColIndex = cursor.getColumnIndex(COLUMN_TASK_TITLE);
-            int priorityColIndex = cursor.getColumnIndex(COLUMN_TASK_PRIORITY);
-            int quantityHColIndex = cursor.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
-            int isSolvedColIndex = cursor.getColumnIndex(COLUMN_TASK_IS_SOLVED);
-
-            do {
-                if (cursor.getString(idTask).equals("1")) {
-                    continue;
-                }
-                Task resTask = new Task();
-                resTask.setTitle(cursor.getString(titleColIndex));
-                resTask.setPriority(cursor.getString(priorityColIndex));
-                resTask.setNumberOfHoursToSolve(cursor.getInt(quantityHColIndex));
-                resTask.setIsSolved((cursor.getInt(isSolvedColIndex) != 0));
-                TaskLab.get(this).addTask(resTask);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-    }
 }

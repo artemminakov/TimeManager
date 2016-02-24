@@ -26,10 +26,7 @@ public class AddTimetableOnDateActivity extends Activity {
     private String yearCalendarView = "year";
     private String monthCalendarView = "month";
     private String dayOfMonthCalendarView = "day";
-    private int[] taskIds = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    private int positionInTasksIds = 0;
     private boolean[] tasksSolve = new boolean[15];
-    private int positionInTaskSolve = 0;
     private StringBuilder dateTimetable = new StringBuilder();
     private StringBuilder dateTimetableTitle = new StringBuilder();
 
@@ -38,7 +35,8 @@ public class AddTimetableOnDateActivity extends Activity {
     private int dayOfMonth;
 
     private ArrayList<Task> mTasks;
-    TaskDatabaseHelper taskDBHelper;
+    private TaskDatabaseHelper taskDBHelper;
+    private SQLiteDatabase taskDB;
     final String LOG_TAG = "myLogs";
     private int taskPositionInTimetable;
 
@@ -103,7 +101,7 @@ public class AddTimetableOnDateActivity extends Activity {
             dateTimetableTitle.append(0);
         }
         dateTimetable.append(month + 1).append(".").append(year);
-        addTaskToDatabase(dateTimetable.toString());
+        addTimeteableToDatabase(dateTimetable.toString());
         dateTimetableTitle.append(month + 1).append(".").append(year);
         TextView titleTextView = (TextView) findViewById(R.id.textViewHeaderAddTimetableOnData);
         StringBuilder title = new StringBuilder();
@@ -165,7 +163,7 @@ public class AddTimetableOnDateActivity extends Activity {
             return;
         }
         int taskResId;
-        taskResId = Integer.parseInt(data.getStringExtra("taskId"));
+        taskResId = data.getIntExtra("taskId", 1);
         Log.d(LOG_TAG, "Full activity result -> " + dateTimetable.toString() + ", " + taskResId);
         updateTaskDB(dateTimetable.toString(), taskResId);
         return;
@@ -189,83 +187,17 @@ public class AddTimetableOnDateActivity extends Activity {
     public void onResume() {
         super.onResume();
         Log.d(LOG_TAG, "onResume()");
-        queryTaskDBHelper(dateTimetable.toString());
+        taskDB = taskDBHelper.getWritableDatabase();
+        tasksSolve = TaskDatabaseHelper.queryGetOnDateTimetable(dateTimetable.toString(), taskDB, getApplicationContext());
         ListView listView = (ListView) findViewById(R.id.listViewTasksAddTimetableOnData);
         TaskAdapter adapter = new TaskAdapter(mTasks);
         listView.setAdapter(adapter);
     }
 
-    private void queryTaskDBHelper(String date) {
-        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
-
-        String sqlQuery = "select * from timetable where date = \"" + date + "\"";
-
-        Log.d(LOG_TAG, "Date = " + date);
-        Log.d(LOG_TAG, "In queryTaskDBHelper!!! " );
-
-        Cursor cursor = taskDB.rawQuery(sqlQuery, null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                do {
-                    for (String columnNames : cursor.getColumnNames()) {
-                        if (columnNames.matches("idTimetable") || columnNames.matches("date")) {
-                            continue;
-                        } else {
-                            Cursor cursor1 = taskDB.rawQuery("select * from tasks where idTask = \"" + cursor.getString(cursor.getColumnIndex(columnNames)) + "\"", null);
-                            if (cursor1 != null) {
-                                if (cursor1.moveToFirst()) {
-                                    int titleColIndex = cursor1.getColumnIndex(COLUMN_TASK_TITLE);
-                                    int priorityColIndex = cursor1.getColumnIndex(COLUMN_TASK_PRIORITY);
-                                    int quantityHColIndex = cursor1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
-                                    int isSolvedColIndex = cursor1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
-                                    Task resTask = new Task();
-                                    resTask.setTitle(cursor1.getString(titleColIndex));
-                                    resTask.setPriority(cursor1.getString(priorityColIndex));
-                                    resTask.setNumberOfHoursToSolve(cursor1.getInt(quantityHColIndex));
-                                    resTask.setIsSolved((cursor1.getInt(isSolvedColIndex) != 0));
-                                    DayTimetable.get(getApplicationContext()).addTask(resTask);
-                                }
-                            }
-                            cursor1.close();
-                        }
-                    }
-                } while (cursor.moveToNext());
-            }
-        }
-
-        cursor.close();
-
-        Cursor cursor2 = taskDB.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
-        if (cursor2 != null) {
-            if (cursor2.moveToFirst()) {
-                do {
-                    for (String columnNames : cursor2.getColumnNames()) {
-                        if (columnNames.matches("idTimetableSolve") || columnNames.matches("date")) {
-                            continue;
-                        } else {
-                            int isSolvedColIndex = cursor2.getColumnIndex(columnNames);
-                            boolean isSolved = (cursor2.getInt(isSolvedColIndex) != 0);
-                            if (positionInTaskSolve < tasksSolve.length) {
-                                if (isSolved) {
-                                    tasksSolve[positionInTaskSolve++] = true;
-                                } else {
-                                    tasksSolve[positionInTaskSolve++] = false;
-                                }
-                            }
-                        }
-                    }
-                } while (cursor2.moveToNext());
-            }
-        }
-
-        cursor2.close();
-        positionInTaskSolve = 0;
-    }
-
-    private void addTaskToDatabase(String date) {
+    private void addTimeteableToDatabase(String date) {
         ContentValues cvTimetable = new ContentValues();
         ContentValues cvSolve = new ContentValues();
-        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
+        taskDB = taskDBHelper.getWritableDatabase();
 
         if (isNotCreateTableTimetable(date)) {
             cvTimetable.put(COLUMN_TIMETABLE_DATE, date);
@@ -311,7 +243,7 @@ public class AddTimetableOnDateActivity extends Activity {
     }
 
     private boolean isNotCreateTableSolve(String date) {
-        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
+        taskDB = taskDBHelper.getWritableDatabase();
         Cursor cursor = taskDB.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -325,7 +257,7 @@ public class AddTimetableOnDateActivity extends Activity {
     }
 
     private boolean isNotCreateTableTimetable(String date) {
-        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
+        taskDB = taskDBHelper.getWritableDatabase();
         Cursor cursor = taskDB.rawQuery("select * from timetable where date = \"" + date + "\"", null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -339,7 +271,6 @@ public class AddTimetableOnDateActivity extends Activity {
     }
 
     private void updateTaskDB(String dateTimetable, int taskId) {
-        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
         SQLiteDatabase db = taskDBHelper.getWritableDatabase();
         ContentValues cvTimetable = new ContentValues();
 

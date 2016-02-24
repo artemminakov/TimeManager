@@ -22,7 +22,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textSize="27dp" />
+        android:textSize="27dp"
+        android:focusableInTouchMode="false"/>
 
     <View
         android:layout_width="fill_parent"
@@ -43,7 +44,8 @@
         android:layout_below="@+id/priority_textView_EditTaskActivity"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginLeft="11dp"/>
+        android:layout_marginLeft="11dp"
+        android:visibility="gone"/>
 
 
     <EditText
@@ -59,7 +61,8 @@
         android:layout_marginLeft="20dp"
         android:inputType="numberDecimal"
         android:textColor="#000"
-        android:textColorHint="#939393" />
+        android:textColorHint="#939393"
+        android:focusableInTouchMode="false"/>
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
@@ -68,7 +71,7 @@
         android:layout_below="@+id/quantH_editText_EditTaskActivity"
         android:layout_alignRight="@+id/title_EditTaskActivity"
         android:layout_alignEnd="@+id/title_EditTaskActivity"
-        android:layout_marginTop="5dp" />
+        android:layout_marginTop="5dp"/>
 
     <Button
         android:layout_width="300dp"

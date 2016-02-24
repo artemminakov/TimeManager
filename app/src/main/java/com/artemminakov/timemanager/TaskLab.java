@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.UUID;
 
 
@@ -26,6 +27,7 @@ public class TaskLab {
     }
 
     public ArrayList<Task> getTasks() {
+        Collections.reverse(mTasks);
         return mTasks;
     }
 

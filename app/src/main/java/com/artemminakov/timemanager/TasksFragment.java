@@ -1,10 +1,9 @@
 package com.artemminakov.timemanager;
 
 import android.app.Fragment;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class TasksFragment extends Fragment {
     private ArrayList<Task> mTasks;
@@ -27,15 +27,14 @@ public class TasksFragment extends Fragment {
     private String taskPriority;
     private int taskQuantityHours;
 
-    private static final String TABLE_TASK = "tasks";
-    private static final String COLUMN_TASK_ID = "idTask";
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
     private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
-    private static final String COLUMN_TASK_SPENT_ON_SOLUTION = "spentOnSolution";
+    private static final String LOG_TAG = "TasksFragment";
 
-    TaskDatabaseHelper taskDBHelper;
+    private TaskDatabaseHelper taskDBHelper;
+    private SQLiteDatabase taskDB;
 
 
     public class TaskAdapter extends ArrayAdapter<Task> {
@@ -90,9 +89,13 @@ public class TasksFragment extends Fragment {
         registerForContextMenu(listViewTasks);
         setHasOptionsMenu(true);
 
-        if (isNotCreateTasks()){
+        taskDBHelper = new TaskDatabaseHelper(getActivity().getApplicationContext());
+        taskDB = taskDBHelper.getWritableDatabase();
+        Log.d(LOG_TAG, "onCreateView!");
+
+        if (TaskDatabaseHelper.queryIsNotCreateTasks(taskDB)){
             Task task = new Task(" ", "Средний", 5, false);
-            addTaskToDatabase(task);
+            TaskDatabaseHelper.queryAddTaskToDatabase(task, taskDB);
         }
 
         listViewTasks.setOnItemClickListener(new OnItemClickListener() {
@@ -114,13 +117,16 @@ public class TasksFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(LOG_TAG, "onCreate!");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        queryTaskDBHelper();
+        Log.d(LOG_TAG, "onResume!");
+        TaskDatabaseHelper.queryGetTasks(taskDB, getActivity());
         ListView listViewTasks = (ListView) this.getActivity().findViewById(R.id.listViewTasks);
+        Collections.reverse(mTasks);
         TaskAdapter taskAdapter = new TaskAdapter(mTasks);
         listViewTasks.setAdapter(taskAdapter);
     }
@@ -130,76 +136,26 @@ public class TasksFragment extends Fragment {
         if (data == null) {
             return;
         }
+        Log.d(LOG_TAG, "onActivityResult!");
         taskTitle = data.getStringExtra("title");
         taskQuantityHours = Integer.parseInt(data.getStringExtra("quantity"));
         taskPriority = data.getStringExtra("priority");
         Task task = new Task(taskTitle, taskPriority, taskQuantityHours, false);
-        addTaskToDatabase(task);
+        TaskDatabaseHelper.queryAddTaskToDatabase(task, taskDB);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(LOG_TAG, "onDestroy!");
         TaskLab.get(getActivity()).clear();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        Log.d(LOG_TAG, "onPause!");
         TaskLab.get(getActivity()).clear();
     }
 
-    private void queryTaskDBHelper() {
-        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
-
-        Cursor cursor = taskDB.query(TABLE_TASK, null, null, null, null, null, null);
-
-        if (cursor.moveToFirst()) {
-
-            int idTask = cursor.getColumnIndex(COLUMN_TASK_ID);
-            int titleColIndex = cursor.getColumnIndex(COLUMN_TASK_TITLE);
-            int priorityColIndex = cursor.getColumnIndex(COLUMN_TASK_PRIORITY);
-            int quantityHColIndex = cursor.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
-            int isSolvedColIndex = cursor.getColumnIndex(COLUMN_TASK_IS_SOLVED);
-
-            do {
-                if (cursor.getString(idTask).equals("1")) {
-                    continue;
-                }
-                Task resTask = new Task();
-                resTask.setTitle(cursor.getString(titleColIndex));
-                resTask.setPriority(cursor.getString(priorityColIndex));
-                resTask.setNumberOfHoursToSolve(cursor.getInt(quantityHColIndex));
-                resTask.setIsSolved((cursor.getInt(isSolvedColIndex) != 0));
-                TaskLab.get(getActivity()).addTask(resTask);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-    }
-
-    private void addTaskToDatabase(Task task) {
-        ContentValues contentValues = new ContentValues();
-        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
-        contentValues.put(COLUMN_TASK_TITLE, task.getTitle());
-        contentValues.put(COLUMN_TASK_PRIORITY, task.getPriority());
-        contentValues.put(COLUMN_TASK_QUANTITY_HOURS, task.getNumberOfHoursToSolve());
-        contentValues.put(COLUMN_TASK_IS_SOLVED, (task.isSolved() ? 1 : 0));
-        contentValues.put(COLUMN_TASK_SPENT_ON_SOLUTION, 0);
-        taskDB.insert(TABLE_TASK, null, contentValues);
-    }
-
-    private boolean isNotCreateTasks(){
-        taskDBHelper = new TaskDatabaseHelper(getActivity().getApplicationContext());
-        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
-        Cursor cursor = taskDB.rawQuery("select * from tasks where idTask = \"" + "1" + "\"", null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                cursor.close();
-                return false;
-            }
-        }
-
-        cursor.close();
-        return true;
-    }
 }
