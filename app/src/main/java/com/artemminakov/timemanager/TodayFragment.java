@@ -3,11 +3,13 @@ package com.artemminakov.timemanager;
 import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,11 +36,16 @@ public class TodayFragment extends Fragment {
     private static String[] taskTimePriorityH = new String[15];
     private static String[] taskTimePriorityHTitle = new String[15];
     private int positionInTaskTimePriorityH = 0;
+    private String dateTimetable = "23.2.2016";
+    private int taskPositionInTimetable = 2;
+    final String LOG_TAG = "myLogs";
+
 
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
     private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
+    private static final String TABLE_TIMETABLE = "timetable";
 
     private static final String taskTitle = "title";
     private static final String taskPriority = "priority";
@@ -48,8 +55,8 @@ public class TodayFragment extends Fragment {
     private static final String timetableDate = "timetableDate";
     private static final String taskPosition = "taskPosition";
 
-    private DateFormat df = new SimpleDateFormat("dd.M.yyyy");
-    private Date currDate = new Date();
+    private DateFormat dateFormat = new SimpleDateFormat("dd.M.yyyy");
+    private Date currentDate = new Date();
 
     public class TaskAdapter extends ArrayAdapter<Task> {
         public TaskAdapter(ArrayList<Task> tasks) {
@@ -92,16 +99,26 @@ public class TodayFragment extends Fragment {
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(getActivity().getApplicationContext(), EditTaskActivity.class);
                 Task task = (Task) lvMain.getItemAtPosition(position);
-                i.putExtra(taskTitle, task.getTitle());
-                i.putExtra(taskPriority, task.getPriority());
-                i.putExtra(taskQuantityHours, Integer.toString(task.getNumberOfHoursToSolve()));
-                i.putExtra(taskIsSolved, (tasksSolve[position] ? 1 : 0));
-                i.putExtra(taskExecuted, "Executed");
-                i.putExtra(timetableDate, df.format(currDate));
-                i.putExtra(taskPosition, position);
-                startActivity(i);
+                taskPositionInTimetable = position + 1;
+                Intent intent;
+                if (task.getTitle().equals(" ")) {
+                    intent = new Intent(getActivity().getApplicationContext(), AddTaskToDayTimetableActivity.class);
+                    Log.d(LOG_TAG, "Empty task -> AddTaskToDayTimetable.class");
+                    startActivityForResult(intent, 1);
+                } else {
+                    intent = new Intent(getActivity().getApplicationContext(), EditTaskActivity.class);
+
+                    intent.putExtra(taskTitle, task.getTitle());
+                    intent.putExtra(taskPriority, task.getPriority());
+                    intent.putExtra(taskQuantityHours, Integer.toString(task.getNumberOfHoursToSolve()));
+                    intent.putExtra(taskIsSolved, (tasksSolve[position] ? 1 : 0));
+                    intent.putExtra(taskExecuted, "Executed");
+                    intent.putExtra(timetableDate, dateFormat.format(currentDate));
+                    intent.putExtra(taskPosition, position);
+                    Log.d(LOG_TAG, "Full task -> EditTaskActivity.class");
+                    startActivity(intent);
+                }
             }
         });
 
@@ -111,7 +128,6 @@ public class TodayFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-
         super.onDestroy();
         DayTimetable.get(getActivity()).clear();
     }
@@ -127,75 +143,85 @@ public class TodayFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        queryTaskDBHelper(df.format(currDate));
+        queryTaskDBHelper(dateFormat.format(currentDate));
         mTasks = DayTimetable.get(getActivity()).getTasks();
         ListView listView = (ListView) this.getActivity().findViewById(R.id.listViewSchedule);
-        TaskAdapter adapter = new TaskAdapter(mTasks);
-        listView.setAdapter(adapter);
+        TaskAdapter taskAdapter = new TaskAdapter(mTasks);
+        listView.setAdapter(taskAdapter);
         handleNotification();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {
+            Log.d(LOG_TAG, "Empty activity result");
+            return;
+        }
+        int taskResId;
+        taskResId = Integer.parseInt(data.getStringExtra("taskId"));
+        //dateTimetable = data.getStringExtra(timetableDate);
+        Log.d(LOG_TAG, "Full activity result -> " + dateFormat.format(currentDate) + ", " + taskResId);
+        updateTaskDB(dateFormat.format(currentDate), taskResId);
+    }
 
     private void queryTaskDBHelper(String date) {
         taskDBHelper = new TaskDatabaseHelper(this.getActivity().getApplicationContext());
-        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
+        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
 
         String sqlQuery = "select * from timetable where date = \"" + date + "\"";
 
-        Cursor c = db.rawQuery(sqlQuery, null);
-        if (c != null) {
-            if (c.moveToFirst()) {
-                StringBuilder sb = new StringBuilder();
+        Cursor cursor = taskDB.rawQuery(sqlQuery, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
                 do {
-                    sb.setLength(0);
-                    for (String cn : c.getColumnNames()) {
-                        if (cn.matches("idTimetable") || cn.matches("date")) {
+                    for (String columnName : cursor.getColumnNames()) {
+                        if (columnName.matches("idTimetable") || columnName.matches("date")) {
                             continue;
                         } else {
-                            Cursor c1 = db.rawQuery("select * from task where idTask = \"" + c.getString(c.getColumnIndex(cn)) + "\"", null);
-                            if (c1 != null) {
-                                if (c1.moveToFirst()) {
-                                    int titleColIndex = c1.getColumnIndex(COLUMN_TASK_TITLE);
-                                    int priorityColIndex = c1.getColumnIndex(COLUMN_TASK_PRIORITY);
-                                    int quantityHColIndex = c1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
-                                    int isSolvedColIndex = c1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
+                            Cursor cursor1 = taskDB.rawQuery("select * from tasks where idTask = \"" + cursor.getString(cursor.getColumnIndex(columnName)) + "\"", null);
+                            if (cursor1 != null) {
+                                if (cursor1.moveToFirst()) {
+                                    int titleColIndex = cursor1.getColumnIndex(COLUMN_TASK_TITLE);
+                                    int priorityColIndex = cursor1.getColumnIndex(COLUMN_TASK_PRIORITY);
+                                    int quantityHColIndex = cursor1.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
+                                    int isSolvedColIndex = cursor1.getColumnIndex(COLUMN_TASK_IS_SOLVED);
                                     Task resTask = new Task();
-                                    String var = c1.getString(priorityColIndex);
-                                    int temp = c.getColumnIndex(cn) - 2;
-                                    if (var.matches("Высокий")) {
-                                        if (temp < 15 && positionInTaskTimePriorityH < 15) {
+                                    String priority = cursor1.getString(priorityColIndex);
+                                    int columnIndex = cursor.getColumnIndex(columnName) - 2;
+                                    if (priority.matches("Высокий")) {
+                                        if (columnIndex < 15 && positionInTaskTimePriorityH < 15) {
                                             taskTimePriorityH[positionInTaskTimePriorityH] =
-                                                    taskTime[temp];
+                                                    taskTime[columnIndex];
                                             taskTimePriorityHTitle[positionInTaskTimePriorityH++] =
-                                                    c1.getString(titleColIndex);
+                                                    cursor1.getString(titleColIndex);
                                         }
                                     }
-                                    resTask.setTitle(c1.getString(titleColIndex));
-                                    resTask.setPriority(c1.getString(priorityColIndex));
-                                    resTask.setNumberOfHoursToSolve(c1.getInt(quantityHColIndex));
-                                    resTask.setIsSolved((c1.getInt(isSolvedColIndex) != 0));
+                                    resTask.setTitle(cursor1.getString(titleColIndex));
+                                    resTask.setPriority(cursor1.getString(priorityColIndex));
+                                    resTask.setNumberOfHoursToSolve(cursor1.getInt(quantityHColIndex));
+                                    resTask.setIsSolved((cursor1.getInt(isSolvedColIndex) != 0));
                                     DayTimetable.get(this.getActivity().getApplicationContext()).addTask(resTask);
                                 }
                             }
-                            c1.close();
+                            cursor1.close();
                         }
                     }
-                } while (c.moveToNext());
+                } while (cursor.moveToNext());
             }
         } else
 
-            c.close();
+            cursor.close();
 
-        Cursor c2 = db.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
-        if (c2 != null) {
-            if (c2.moveToFirst()) {
+        Cursor cursor2 = taskDB.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
+        if (cursor2 != null) {
+            if (cursor2.moveToFirst()) {
                 do {
-                    for (String cn : c2.getColumnNames()) {
-                        if (cn.matches("idTimetableSolve") || cn.matches("date")) {
+                    for (String columnName : cursor2.getColumnNames()) {
+                        if (columnName.matches("idTimetableSolve") || columnName.matches("date")) {
                             continue;
                         } else {
-                            int isSolvedColIndex = c2.getColumnIndex(cn);
-                            boolean isSolved = (c2.getInt(isSolvedColIndex) != 0);
+                            int isSolvedColIndex = cursor2.getColumnIndex(columnName);
+                            boolean isSolved = (cursor2.getInt(isSolvedColIndex) != 0);
                             if (positionInTaskSolve < 15) {
                                 if (isSolved) {
                                     tasksSolve[positionInTaskSolve++] = true;
@@ -205,11 +231,11 @@ public class TodayFragment extends Fragment {
                             }
                         }
                     }
-                } while (c2.moveToNext());
+                } while (cursor2.moveToNext());
             }
         }
 
-        c2.close();
+        cursor2.close();
         positionInTaskSolve = 0;
     }
 
@@ -220,5 +246,15 @@ public class TodayFragment extends Fragment {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) this.getActivity().getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 3600000, pendingIntent);
+    }
+
+    private void updateTaskDB(String dateTimetable, int taskId) {
+        taskDBHelper = new TaskDatabaseHelper(getActivity().getApplicationContext());
+        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
+        ContentValues cvTimetable = new ContentValues();
+
+        cvTimetable.put("taskId" + taskPositionInTimetable, taskId);
+
+        db.update(TABLE_TIMETABLE, cvTimetable, "date = ?", new String[]{dateTimetable});
     }
 }

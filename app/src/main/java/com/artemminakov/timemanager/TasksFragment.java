@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +26,6 @@ public class TasksFragment extends Fragment {
     private String taskTitle;
     private String taskPriority;
     private int taskQuantityHours;
-    final String LOG_TAG = "myLogs";
 
     private static final String TABLE_TASK = "tasks";
     private static final String COLUMN_TASK_ID = "idTask";
@@ -74,8 +72,8 @@ public class TasksFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_task:
-                Intent i = new Intent(getActivity().getApplicationContext(), AddTaskActivity.class);
-                startActivityForResult(i, 0);
+                Intent intent = new Intent(getActivity().getApplicationContext(), AddTaskActivity.class);
+                startActivityForResult(intent, 0);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -86,11 +84,10 @@ public class TasksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Log.d(LOG_TAG, "TasksFragment:onCreateView");
         View view = inflater.inflate(R.layout.tasks_fragment, null);
         mTasks = TaskLab.get(getActivity()).getTasks();
-        final ListView lvMain = (ListView) view.findViewById(R.id.listViewTasks);
-        registerForContextMenu(lvMain);
+        final ListView listViewTasks = (ListView) view.findViewById(R.id.listViewTasks);
+        registerForContextMenu(listViewTasks);
         setHasOptionsMenu(true);
 
         if (isNotCreateTasks()){
@@ -98,16 +95,16 @@ public class TasksFragment extends Fragment {
             addTaskToDatabase(task);
         }
 
-        lvMain.setOnItemClickListener(new OnItemClickListener() {
+        listViewTasks.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(getActivity().getApplicationContext(), EditTaskActivity.class);
-                Task task = (Task) lvMain.getItemAtPosition(position);
-                i.putExtra(COLUMN_TASK_TITLE, task.getTitle());
-                i.putExtra(COLUMN_TASK_PRIORITY, task.getPriority());
-                i.putExtra(COLUMN_TASK_QUANTITY_HOURS, Integer.toString(task.getNumberOfHoursToSolve()));
-                i.putExtra(COLUMN_TASK_IS_SOLVED, (task.isSolved() ? 1 : 0));
-                startActivity(i);
+                Intent intent = new Intent(getActivity().getApplicationContext(), EditTaskActivity.class);
+                Task task = (Task) listViewTasks.getItemAtPosition(position);
+                intent.putExtra(COLUMN_TASK_TITLE, task.getTitle());
+                intent.putExtra(COLUMN_TASK_PRIORITY, task.getPriority());
+                intent.putExtra(COLUMN_TASK_QUANTITY_HOURS, Integer.toString(task.getNumberOfHoursToSolve()));
+                intent.putExtra(COLUMN_TASK_IS_SOLVED, (task.isSolved() ? 1 : 0));
+                startActivity(intent);
             }
         });
 
@@ -116,18 +113,16 @@ public class TasksFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "TasksFragment:onCreate");
         super.onCreate(savedInstanceState);
     }
 
     @Override
     public void onResume() {
-        Log.d(LOG_TAG, "TasksFragment:onResume");
         super.onResume();
         queryTaskDBHelper();
-        ListView listView = (ListView) this.getActivity().findViewById(R.id.listViewTasks);
-        TaskAdapter adapter = new TaskAdapter(mTasks);
-        listView.setAdapter(adapter);
+        ListView listViewTasks = (ListView) this.getActivity().findViewById(R.id.listViewTasks);
+        TaskAdapter taskAdapter = new TaskAdapter(mTasks);
+        listViewTasks.setAdapter(taskAdapter);
     }
 
     @Override
@@ -144,55 +139,53 @@ public class TasksFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        Log.d(LOG_TAG, "TasksFragment:onDestroy");
         super.onDestroy();
         TaskLab.get(getActivity()).clear();
     }
 
     @Override
     public void onPause() {
-        Log.d(LOG_TAG, "TasksFragment:onPause");
         super.onPause();
         TaskLab.get(getActivity()).clear();
     }
 
     private void queryTaskDBHelper() {
-        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
+        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
 
-        Cursor c = db.query(TABLE_TASK, null, null, null, null, null, null);
+        Cursor cursor = taskDB.query(TABLE_TASK, null, null, null, null, null, null);
 
-        if (c.moveToFirst()) {
+        if (cursor.moveToFirst()) {
 
-            int idTask = c.getColumnIndex(COLUMN_TASK_ID);
-            int titleColIndex = c.getColumnIndex(COLUMN_TASK_TITLE);
-            int priorityColIndex = c.getColumnIndex(COLUMN_TASK_PRIORITY);
-            int quantityHColIndex = c.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
-            int isSolvedColIndex = c.getColumnIndex(COLUMN_TASK_IS_SOLVED);
+            int idTask = cursor.getColumnIndex(COLUMN_TASK_ID);
+            int titleColIndex = cursor.getColumnIndex(COLUMN_TASK_TITLE);
+            int priorityColIndex = cursor.getColumnIndex(COLUMN_TASK_PRIORITY);
+            int quantityHColIndex = cursor.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
+            int isSolvedColIndex = cursor.getColumnIndex(COLUMN_TASK_IS_SOLVED);
 
             do {
-                if (c.getString(idTask).equals("1")) {
+                if (cursor.getString(idTask).equals("1")) {
                     continue;
                 }
                 Task resTask = new Task();
-                resTask.setTitle(c.getString(titleColIndex));
-                resTask.setPriority(c.getString(priorityColIndex));
-                resTask.setNumberOfHoursToSolve(c.getInt(quantityHColIndex));
-                resTask.setIsSolved((c.getInt(isSolvedColIndex) != 0));
+                resTask.setTitle(cursor.getString(titleColIndex));
+                resTask.setPriority(cursor.getString(priorityColIndex));
+                resTask.setNumberOfHoursToSolve(cursor.getInt(quantityHColIndex));
+                resTask.setIsSolved((cursor.getInt(isSolvedColIndex) != 0));
                 TaskLab.get(getActivity()).addTask(resTask);
-            } while (c.moveToNext());
+            } while (cursor.moveToNext());
         }
-        c.close();
+        cursor.close();
     }
 
     private void addTaskToDatabase(Task task) {
-        ContentValues cv = new ContentValues();
-        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
-        cv.put(COLUMN_TASK_TITLE, task.getTitle());
-        cv.put(COLUMN_TASK_PRIORITY, task.getPriority());
-        cv.put(COLUMN_TASK_QUANTITY_HOURS, task.getNumberOfHoursToSolve());
-        cv.put(COLUMN_TASK_IS_SOLVED, (task.isSolved() ? 1 : 0));
-        cv.put(COLUMN_TASK_SPENT_ON_SOLUTION, 0);
-        db.insert(TABLE_TASK, null, cv);
+        ContentValues contentValues = new ContentValues();
+        SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
+        contentValues.put(COLUMN_TASK_TITLE, task.getTitle());
+        contentValues.put(COLUMN_TASK_PRIORITY, task.getPriority());
+        contentValues.put(COLUMN_TASK_QUANTITY_HOURS, task.getNumberOfHoursToSolve());
+        contentValues.put(COLUMN_TASK_IS_SOLVED, (task.isSolved() ? 1 : 0));
+        contentValues.put(COLUMN_TASK_SPENT_ON_SOLUTION, 0);
+        taskDB.insert(TABLE_TASK, null, contentValues);
     }
 
     private boolean isNotCreateTasks(){

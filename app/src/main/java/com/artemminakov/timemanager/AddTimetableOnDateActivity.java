@@ -21,7 +21,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 
-public class AddTimetableOnDataActivity extends Activity {
+public class AddTimetableOnDateActivity extends Activity {
 
     private String yearCalendarView = "year";
     private String monthCalendarView = "month";
@@ -40,12 +40,13 @@ public class AddTimetableOnDataActivity extends Activity {
     private ArrayList<Task> mTasks;
     TaskDatabaseHelper taskDBHelper;
     final String LOG_TAG = "myLogs";
+    private int taskPositionInTimetable;
 
 
     private static final String TABLE_TIMETABLE = "timetable";
     private static final String COLUMN_TIMETABLE_DATE = "date";
     private static final String[] COLUMN_TIMETABLE_TASKS = {"taskId1", "taskId2", "taskId3", "taskId4", "taskId5", "taskId6", "taskId7",
-                                             "taskId8", "taskId9", "taskId10", "taskId11", "taskId12", "taskId13", "taskId14", "taskId15"};
+            "taskId8", "taskId9", "taskId10", "taskId11", "taskId12", "taskId13", "taskId14", "taskId15"};
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
     private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
@@ -115,16 +116,24 @@ public class AddTimetableOnDataActivity extends Activity {
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(getApplicationContext(), EditTaskActivity.class);
                 Task task = (Task) lvMain.getItemAtPosition(position);
-                i.putExtra(COLUMN_TASK_TITLE, task.getTitle());
-                i.putExtra(COLUMN_TASK_PRIORITY, task.getPriority());
-                i.putExtra(COLUMN_TASK_QUANTITY_HOURS, Integer.toString(task.getNumberOfHoursToSolve()));
-                i.putExtra(COLUMN_TASK_IS_SOLVED, (tasksSolve[position] ? 1 : 0));
-                i.putExtra(taskExecuted, "Executed");
-                i.putExtra(timetableDate, dateTimetable.toString());
-                i.putExtra(taskPosition, position);
-                startActivity(i);
+                taskPositionInTimetable = position + 1;
+                Intent intent;
+                if (task.getTitle().equals(" ")) {
+                    intent = new Intent(getApplicationContext(), AddTaskToDayTimetableActivity.class);
+                    intent.putExtra(taskExecuted, "Executed");
+                    startActivityForResult(intent, 1);
+                } else {
+                    intent = new Intent(getApplicationContext(), EditTaskActivity.class);
+                    intent.putExtra(COLUMN_TASK_TITLE, task.getTitle());
+                    intent.putExtra(COLUMN_TASK_PRIORITY, task.getPriority());
+                    intent.putExtra(COLUMN_TASK_QUANTITY_HOURS, Integer.toString(task.getNumberOfHoursToSolve()));
+                    intent.putExtra(COLUMN_TASK_IS_SOLVED, (tasksSolve[position] ? 1 : 0));
+                    intent.putExtra(taskExecuted, "Executed");
+                    intent.putExtra(timetableDate, dateTimetable.toString());
+                    intent.putExtra(taskPosition, position);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -135,8 +144,8 @@ public class AddTimetableOnDataActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.action_add_task:
                 if (mTasks.size() < 15) {
-                    Intent i = new Intent(this.getApplicationContext(), AddTaskToDayTimetableActivity.class);
-                    startActivityForResult(i, 0);
+                    Intent intent = new Intent(this.getApplicationContext(), AddTaskToDayTimetableActivity.class);
+                    startActivityForResult(intent, 0);
                     return true;
                 }
                 return true;
@@ -157,7 +166,9 @@ public class AddTimetableOnDataActivity extends Activity {
         }
         int taskResId;
         taskResId = Integer.parseInt(data.getStringExtra("taskId"));
-        taskIds[positionInTasksIds] = taskResId;
+        Log.d(LOG_TAG, "Full activity result -> " + dateTimetable.toString() + ", " + taskResId);
+        updateTaskDB(dateTimetable.toString(), taskResId);
+        return;
     }
 
     @Override
@@ -190,16 +201,17 @@ public class AddTimetableOnDataActivity extends Activity {
         String sqlQuery = "select * from timetable where date = \"" + date + "\"";
 
         Log.d(LOG_TAG, "Date = " + date);
+        Log.d(LOG_TAG, "In queryTaskDBHelper!!! " );
 
         Cursor cursor = taskDB.rawQuery(sqlQuery, null);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 do {
-                    for (String cn : cursor.getColumnNames()) {
-                        if (cn.matches("idTimetable") || cn.matches("date")) {
+                    for (String columnNames : cursor.getColumnNames()) {
+                        if (columnNames.matches("idTimetable") || columnNames.matches("date")) {
                             continue;
                         } else {
-                            Cursor cursor1 = taskDB.rawQuery("select * from tasks where idTask = \"" + cursor.getString(cursor.getColumnIndex(cn)) + "\"", null);
+                            Cursor cursor1 = taskDB.rawQuery("select * from tasks where idTask = \"" + cursor.getString(cursor.getColumnIndex(columnNames)) + "\"", null);
                             if (cursor1 != null) {
                                 if (cursor1.moveToFirst()) {
                                     int titleColIndex = cursor1.getColumnIndex(COLUMN_TASK_TITLE);
@@ -227,11 +239,11 @@ public class AddTimetableOnDataActivity extends Activity {
         if (cursor2 != null) {
             if (cursor2.moveToFirst()) {
                 do {
-                    for (String cn : cursor2.getColumnNames()) {
-                        if (cn.matches("idTimetableSolve") || cn.matches("date")) {
+                    for (String columnNames : cursor2.getColumnNames()) {
+                        if (columnNames.matches("idTimetableSolve") || columnNames.matches("date")) {
                             continue;
                         } else {
-                            int isSolvedColIndex = cursor2.getColumnIndex(cn);
+                            int isSolvedColIndex = cursor2.getColumnIndex(columnNames);
                             boolean isSolved = (cursor2.getInt(isSolvedColIndex) != 0);
                             if (positionInTaskSolve < tasksSolve.length) {
                                 if (isSolved) {
@@ -312,7 +324,7 @@ public class AddTimetableOnDataActivity extends Activity {
         return true;
     }
 
-    private boolean isNotCreateTableTimetable(String date){
+    private boolean isNotCreateTableTimetable(String date) {
         SQLiteDatabase taskDB = taskDBHelper.getWritableDatabase();
         Cursor cursor = taskDB.rawQuery("select * from timetable where date = \"" + date + "\"", null);
         if (cursor != null) {
@@ -324,5 +336,16 @@ public class AddTimetableOnDataActivity extends Activity {
 
         cursor.close();
         return true;
+    }
+
+    private void updateTaskDB(String dateTimetable, int taskId) {
+        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
+        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
+        ContentValues cvTimetable = new ContentValues();
+
+        cvTimetable.put("taskId" + taskPositionInTimetable, taskId);
+        Log.d(LOG_TAG, "AddTimetableOnDataActivity update -> " + dateTimetable.toString() + ", " + taskId + " " + taskPositionInTimetable);
+
+        db.update(TABLE_TIMETABLE, cvTimetable, "date = ?", new String[]{dateTimetable});
     }
 }

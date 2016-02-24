@@ -7,7 +7,7 @@
     <string name="delete_task">Удалить</string>
     <string name="message_box_title">Важная задача</string>
     <string name="message_timesheet_not_up_to_date"></string>
-    <string-array name="items_array">
+    <string-array name="menu_items_array">
         <item>Сегодня</item>
         <item>Календарь</item>
         <item>Задачи</item>

@@ -34,13 +34,13 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public void onSelectedDayChange(CalendarView calendarView1, int year, int month, int dayOfMonth) {
-                Intent i = new Intent(getActivity().getApplicationContext(), AddTimetableOnDataActivity.class);
-                i.putExtra(yearCalendarView, year);
-                i.putExtra(monthCalendarView, month);
-                i.putExtra(dayOfMonthCalendarView, dayOfMonth);
+                Intent intent = new Intent(getActivity().getApplicationContext(), AddTimetableOnDateActivity.class);
+                intent.putExtra(yearCalendarView, year);
+                intent.putExtra(monthCalendarView, month);
+                intent.putExtra(dayOfMonthCalendarView, dayOfMonth);
                 if (calendarView.getDate() != date) {
                     date = calendarView.getDate();
-                    startActivity(i);
+                    startActivity(intent);
                 }
             }
         });

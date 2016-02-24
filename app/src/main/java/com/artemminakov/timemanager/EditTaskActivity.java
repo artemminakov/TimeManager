@@ -27,7 +27,7 @@ public class EditTaskActivity extends Activity {
     private static final String timetableDate = "timetableDate";
     private static final String taskPosition = "taskPosition";
 
-    private static final String TABLE_TASK = "task";
+    private static final String TABLE_TASK = "tasks";
     private static final String COLUMN_TASK_ID = "idTask";
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
@@ -63,6 +63,8 @@ public class EditTaskActivity extends Activity {
         final EditText quantityHoursEditText = (EditText) findViewById(R.id.quantH_editText_EditTaskActivity);
         extraPriority = getIntent().getStringExtra(taskPriorityName);
 
+        taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1) + 1;
+
         quantityHoursEditText.setText(getIntent().getStringExtra(taskQuantityHoursName));
 
         final CheckBox checkBoxSolve = (CheckBox) findViewById(R.id.checkBox_EditTaskActivity);
@@ -84,8 +86,8 @@ public class EditTaskActivity extends Activity {
         changeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), AddTaskToDayTimetableActivity.class);
-                startActivityForResult(i, 0);
+                Intent intent = new Intent(getApplicationContext(), AddTaskToDayTimetableActivity.class);
+                startActivityForResult(intent, 0);
             }
         });
 
@@ -113,8 +115,7 @@ public class EditTaskActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (dateTimetable != null) {
-                    taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1) + 1;
-                    editSolveQueryTaskDBHelper(dateTimetable, taskPositionInTimetable);
+                    editSolveQueryTaskDBHelper(dateTimetable);
                     finish();
                 } else {
                     isSolvedTask = checkBoxSolve.isChecked();
@@ -171,7 +172,7 @@ public class EditTaskActivity extends Activity {
 
     }
 
-    private void editSolveQueryTaskDBHelper(String dateTimetable, int taskPosition) {
+    private void editSolveQueryTaskDBHelper(String dateTimetable) {
         taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
         SQLiteDatabase db = taskDBHelper.getWritableDatabase();
         ContentValues cvTask = new ContentValues();
@@ -198,7 +199,7 @@ public class EditTaskActivity extends Activity {
         }
         c.close();
 
-        Cursor c1 = db.rawQuery("select * from task where idTask = \"" + editTaskId + "\"", null);
+        Cursor c1 = db.rawQuery("select * from tasks where idTask = \"" + editTaskId + "\"", null);
         if (c1 != null) {
             if (c1.moveToFirst()) {
                 int toSolveHours = c1.getColumnIndex(COLUMN_TASK_SPENT_ON_SOLUTION);
