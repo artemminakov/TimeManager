@@ -4,9 +4,10 @@
 Just import build.gradle file from the IDE itself using File -> Open.
 
 ## How to ##
-After starting the application a timetable for the current date appears. 
-To add schedule tasks you need to create them in the menu tab named "Tasks". 
-After adding tasks, you can use and edit them in the schedule. 
-To add a task to the timetable you have to click on an empty space and select a task. 
-To create a schedule for a specific date you should go the "Calendar" tab in the menu, and then select a date. 
-To view the statistics of your schedule, you should go to the "Statistics" tab in the menu.
+Application start sreen shows timetable with tasks for the current date.
+Tasks can be created in the tab "Tasks". 
+After creating tasks, you can add them in to the timetable. 
+To add a task to the timetable you should click on the free time and select a task. 
+To create a timetable for a specific date you should go the "Calendar" tab, and then select a date. 
+Push notification will be send for all high priority tasks acording in the timetable.
+To view the statistics of your timetable, you should go to the "Statistics" tab in the menu.
