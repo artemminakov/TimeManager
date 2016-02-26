@@ -23,9 +23,6 @@ import java.util.Collections;
 
 public class TasksFragment extends Fragment {
     private ArrayList<Task> mTasks;
-    private String taskTitle;
-    private String taskPriority;
-    private int taskQuantityHours;
 
     private static final String COLUMN_TASK_TITLE = "title";
     private static final String COLUMN_TASK_PRIORITY = "priority";
@@ -137,11 +134,6 @@ public class TasksFragment extends Fragment {
             return;
         }
         Log.d(LOG_TAG, "onActivityResult!");
-        taskTitle = data.getStringExtra("title");
-        taskQuantityHours = Integer.parseInt(data.getStringExtra("quantity"));
-        taskPriority = data.getStringExtra("priority");
-        Task task = new Task(taskTitle, taskPriority, taskQuantityHours, false);
-        TaskDatabaseHelper.queryAddTaskToDatabase(task, taskDB);
     }
 
     @Override

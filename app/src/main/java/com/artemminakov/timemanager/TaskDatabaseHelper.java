@@ -24,9 +24,16 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
     private static final String COLUMN_TASK_SPENT_ON_SOLUTION = "spentOnSolution";
 
-
+    //table timetable
     private static final String TABLE_TIMETABLE = "timetable";
+
+    //table timetableSolve
     private static final String TABLE_TIMETABLESOLVE = "timetableSolve";
+    private static final String COLUMN_TIMETABLESOLVE_DATE = "date";
+
+    private static final String COLUMN_TIMETABLE_DATE = "date";
+    private static final String[] COLUMN_TIMETABLE_TASKS = {"taskId1", "taskId2", "taskId3", "taskId4", "taskId5", "taskId6", "taskId7",
+            "taskId8", "taskId9", "taskId10", "taskId11", "taskId12", "taskId13", "taskId14", "taskId15"};
 
 
     public TaskDatabaseHelper(Context context) {
@@ -93,6 +100,7 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
             int priorityColIndex = cursor.getColumnIndex(COLUMN_TASK_PRIORITY);
             int quantityHColIndex = cursor.getColumnIndex(COLUMN_TASK_QUANTITY_HOURS);
             int isSolvedColIndex = cursor.getColumnIndex(COLUMN_TASK_IS_SOLVED);
+            int spendOnSolveColIndex = cursor.getColumnIndex(COLUMN_TASK_SPENT_ON_SOLUTION);
 
             do {
                 if (cursor.getString(idTask).equals("1")) {
@@ -102,7 +110,15 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
                 resTask.setTitle(cursor.getString(titleColIndex));
                 resTask.setPriority(cursor.getString(priorityColIndex));
                 resTask.setNumberOfHoursToSolve(cursor.getInt(quantityHColIndex));
-                resTask.setIsSolved((cursor.getInt(isSolvedColIndex) != 0));
+                int toSolve = cursor.getInt(quantityHColIndex);
+                int spendOnSolve = cursor.getInt(spendOnSolveColIndex);
+
+                if (spendOnSolve >= toSolve){
+                    resTask.setIsSolved(true);
+                    queryEditTask(resTask, resTask.getTitle(), taskDB);
+                }else {
+                    resTask.setIsSolved((cursor.getInt(isSolvedColIndex) != 0));
+                }
                 TaskLab.get(context).addTask(resTask);
             } while (cursor.moveToNext());
         }
@@ -122,7 +138,6 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
             do {
                 if (cursor.getString(titleColIndex).equals(taskTitle)) {
                     int taskPosition = cursor.getInt(idTask);
-                    Log.d(LOG_TAG, "Task position 22 " + taskPosition);
                     cursor.close();
                     return taskPosition;
                 }
@@ -286,5 +301,149 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
         timetableCV.put("taskId" + taskPositionInTimetable, taskId);
 
         taskDB.update(TABLE_TIMETABLE, timetableCV, "date = ?", new String[]{dateTimetable});
+    }
+
+    public static void addTimeteableToDatabase(String date, SQLiteDatabase taskDB) {
+        ContentValues cvTimetable = new ContentValues();
+        ContentValues cvSolve = new ContentValues();
+
+
+        if (isNotCreateTableTimetable(date, taskDB)) {
+            cvTimetable.put(COLUMN_TIMETABLE_DATE, date);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[0], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[1], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[2], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[3], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[4], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[5], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[6], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[7], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[8], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[9], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[10], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[11], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[12], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[13], 1);
+            cvTimetable.put(COLUMN_TIMETABLE_TASKS[14], 1);
+
+            taskDB.insert(TABLE_TIMETABLE, null, cvTimetable);
+        }
+
+        if (isNotCreateTableSolve(date, taskDB)) {
+            cvSolve.put(COLUMN_TIMETABLE_DATE, date);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[0], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[1], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[2], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[3], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[4], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[5], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[6], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[7], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[8], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[9], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[10], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[11], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[12], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[13], 0);
+            cvSolve.put(COLUMN_TIMETABLE_TASKS[14], 0);
+
+            taskDB.insert(TABLE_TIMETABLESOLVE, null, cvSolve);
+        }
+    }
+
+    private static boolean isNotCreateTableSolve(String date, SQLiteDatabase taskDB) {
+        Cursor cursor = taskDB.rawQuery("select * from timetableSolve where date = \"" + date + "\"", null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                cursor.close();
+                return false;
+            }
+        }
+
+        cursor.close();
+        return true;
+    }
+
+    private static boolean isNotCreateTableTimetable(String date, SQLiteDatabase taskDB) {
+        Cursor cursor = taskDB.rawQuery("select * from timetable where date = \"" + date + "\"", null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                cursor.close();
+                return false;
+            }
+        }
+
+        cursor.close();
+        return true;
+    }
+
+    public static int[] queryStatisticToday(String date, SQLiteDatabase taskDB) {
+
+        String sqlQuery = "select * from timetableSolve where date = \"" + date + "\"";
+
+        int statistic[] = new int[2];
+        int countExecuteTask = 0;
+        int countOverdueTask = 0;
+
+        Cursor c = taskDB.rawQuery(sqlQuery, null);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    for (String cn : c.getColumnNames()) {
+                        if (cn.matches("idTimetableSolve") || cn.matches("date")) {
+                            continue;
+                        } else {
+                            int isSolvedColIndex = c.getColumnIndex(cn);
+                            boolean isSolved = (c.getInt(isSolvedColIndex) != 0);
+                            if (isSolved) {
+                                countExecuteTask++;
+                            } else {
+                                countOverdueTask++;
+                            }
+                        }
+                    }
+                } while (c.moveToNext());
+            }
+        } else
+
+            c.close();
+        statistic[0] = countExecuteTask;
+        statistic[1] = countOverdueTask;
+        return statistic;
+    }
+
+    public static int[] queryBetweenDateStatistic(String date1, String date2, SQLiteDatabase taskDB) {
+
+        Cursor c = taskDB.query(TABLE_TIMETABLESOLVE, null, COLUMN_TIMETABLESOLVE_DATE + " BETWEEN ? AND ?", new String[]{
+                date1, date2}, null, null, null, null);
+
+        int statistic[] = new int[2];
+        int countExecuteTask = 0;
+        int countOverdueTask = 0;
+
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    for (String cn : c.getColumnNames()) {
+                        if (cn.matches("idTimetableSolve") || cn.matches("date")) {
+                            continue;
+                        } else {
+                            int isSolvedColIndex = c.getColumnIndex(cn);
+                            boolean isSolved = (c.getInt(isSolvedColIndex) != 0);
+                            if (isSolved) {
+                                countExecuteTask++;
+                            } else {
+                                countOverdueTask++;
+                            }
+                        }
+                    }
+                } while (c.moveToNext());
+            }
+        }
+
+        c.close();
+        statistic[0] = countExecuteTask;
+        statistic[1] = countOverdueTask;
+        return statistic;
     }
 }

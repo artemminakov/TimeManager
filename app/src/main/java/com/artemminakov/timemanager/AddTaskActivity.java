@@ -2,6 +2,7 @@ package com.artemminakov.timemanager;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,10 +15,10 @@ public class AddTaskActivity extends Activity {
 
     private String[] priority = {"Низкий", "Средний", "Высокий"};
 
-    private String taskTitleName = "title";
-    private String taskQuantityHoursName = "quantity";
-    private String taskPriorityName = "priority";
     private String taskPriority;
+
+    private TaskDatabaseHelper taskDBHelper;
+    private SQLiteDatabase taskDB;
 
 
     @Override
@@ -29,6 +30,8 @@ public class AddTaskActivity extends Activity {
         final EditText titleEditText = (EditText) findViewById(R.id.title_AddTaskActivity);
         final EditText quantityHoursEditText = (EditText) findViewById(R.id.quantH_editText_AddTaskActivity);
         Spinner prioritySpinner = (Spinner) findViewById(R.id.spinner_AddTaskActivity);
+        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
+        taskDB = taskDBHelper.getWritableDatabase();
         prioritySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -46,9 +49,11 @@ public class AddTaskActivity extends Activity {
                 if (!titleEditText.getText().toString().matches("") &&
                         !quantityHoursEditText.getText().toString().matches("")) {
                     Intent intent = new Intent();
-                    intent.putExtra(taskPriorityName, taskPriority);
-                    intent.putExtra(taskTitleName, titleEditText.getText().toString());
-                    intent.putExtra(taskQuantityHoursName, quantityHoursEditText.getText().toString());
+                    Task task = new Task();
+                    task.setPriority(taskPriority);
+                    task.setTitle(titleEditText.getText().toString());
+                    task.setNumberOfHoursToSolve(Integer.parseInt(quantityHoursEditText.getText().toString()));
+                    TaskDatabaseHelper.queryAddTaskToDatabase(task, taskDB);
                     setResult(RESULT_OK, intent);
                     finish();
                 }

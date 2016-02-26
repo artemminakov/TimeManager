@@ -2,10 +2,12 @@ package com.artemminakov.timemanager;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,7 +24,7 @@ public class AddTaskToDayTimetableActivity extends Activity {
 
     private ArrayList<Task> mTasks;
 
-    private final String LOG_TAG = "myLogs";
+    private final String LOG_TAG = "AddTaskToDayTimetableActivity";
 
     private TaskDatabaseHelper taskDBHelper;
     private SQLiteDatabase taskDB;
@@ -53,9 +55,29 @@ public class AddTaskToDayTimetableActivity extends Activity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.task_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add_task:
+                Intent intent = new Intent(getApplicationContext(), AddTaskActivity.class);
+                startActivityForResult(intent, 0);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.add_task_to_day_timetable_activity);
         mTasks = TaskLab.get(this).getTasks();
         final ListView listVievTasks = (ListView) findViewById(R.id.listViewTasks_AddToDay);

@@ -12,7 +12,6 @@ import android.support.v4.app.NotificationCompat;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 public class AlarmReceiver extends BroadcastReceiver {
 

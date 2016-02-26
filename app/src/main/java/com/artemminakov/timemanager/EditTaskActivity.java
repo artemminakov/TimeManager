@@ -1,9 +1,7 @@
 package com.artemminakov.timemanager;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
@@ -26,17 +24,6 @@ public class EditTaskActivity extends Activity {
     private static final String taskExecuted = "executed";
     private static final String timetableDate = "timetableDate";
     private static final String taskPosition = "taskPosition";
-
-    private static final String TABLE_TASK = "tasks";
-    private static final String COLUMN_TASK_ID = "idTask";
-    private static final String COLUMN_TASK_TITLE = "title";
-    private static final String COLUMN_TASK_PRIORITY = "priority";
-    private static final String COLUMN_TASK_QUANTITY_HOURS = "quantityHours";
-    private static final String COLUMN_TASK_IS_SOLVED = "isSolved";
-    private static final String COLUMN_TASK_SPENT_ON_SOLUTION = "spentOnSolution";
-
-    private static final String TABLE_TIMETABLESOLVE = "timetableSolve";
-    private static final String TABLE_TIMETABLE = "timetable";
 
     private String extraPriority;
     private int selectonPrioritySpinner = 1;
@@ -158,16 +145,5 @@ public class EditTaskActivity extends Activity {
         TaskDatabaseHelper.queryUpdateTask(dateTimetable, taskResId, taskPositionInTimetable, tasksDB);
         finish();
     }
-
-    /*private void updateTaskDB(String dateTimetable, int taskId) {
-        taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1) + 1;
-        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
-        SQLiteDatabase db = taskDBHelper.getWritableDatabase();
-        ContentValues cvTimetable = new ContentValues();
-
-        cvTimetable.put("taskId" + taskPositionInTimetable, taskId);
-
-        db.update(TABLE_TIMETABLE, cvTimetable, "date = ?", new String[]{dateTimetable});
-    }*/
 
 }
