@@ -56,7 +56,7 @@ public class StatisticsFragment extends Fragment {
                         break;
                     case 1:
                         cal.setTime(currDate);
-                        cal.add(Calendar.DATE, -7);
+                        cal.add(Calendar.DATE, -6);
                         Date dateMin = cal.getTime();
                         setZeroStatistics();
                         statistics = TaskDatabaseHelper.queryBetweenDateStatistic(df.format(dateMin), df.format(currDate), taskDB);

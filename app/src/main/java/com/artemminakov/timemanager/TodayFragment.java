@@ -21,6 +21,7 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -53,6 +54,9 @@ public class TodayFragment extends Fragment {
     private static final String timetableDate = "timetableDate";
     private static final String taskPosition = "taskPosition";
 
+    private final String NOTIFICATIONEXTR = "Notification";
+    private String isNotification = "";
+
     private DateFormat dateFormat = new SimpleDateFormat("dd.M.yyyy");
     private Date currentDate = new Date();
 
@@ -81,9 +85,26 @@ public class TodayFragment extends Fragment {
         }
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(LOG_TAG, "onCreate!");
+        taskDBHelper = new TaskDatabaseHelper(getActivity().getApplicationContext());
+        taskDB = taskDBHelper.getWritableDatabase();
+        TaskDatabaseHelper.addTimeteableToDatabase(dateFormat.format(currentDate), taskDB);
+        queryTaskDBHelper(dateFormat.format(currentDate));
+        if (TaskDatabaseHelper.queryIsNotCreateTasks(taskDB)){
+            Task task = new Task(" ", "Средний", 5, false);
+            TaskDatabaseHelper.queryAddTaskToDatabase(task, taskDB);
+        }
+        isNotification = getActivity().getIntent().getStringExtra(NOTIFICATIONEXTR);
+
+        Log.d(LOG_TAG, "onCreate! " + isNotification);
+
+        if (isNotification == null) {
+            handleNotification();
+        }
     }
 
     @Override
@@ -93,14 +114,7 @@ public class TodayFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.today_fragment, null);
         final ListView lvMain = (ListView) view.findViewById(R.id.listViewSchedule);
-
-        taskDBHelper = new TaskDatabaseHelper(getActivity().getApplicationContext());
-        taskDB = taskDBHelper.getWritableDatabase();
         Log.d(LOG_TAG, "onCreateView!");
-        if (TaskDatabaseHelper.queryIsNotCreateTasks(taskDB)){
-            Task task = new Task(" ", "Средний", 5, false);
-            TaskDatabaseHelper.queryAddTaskToDatabase(task, taskDB);
-        }
 
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -158,7 +172,6 @@ public class TodayFragment extends Fragment {
         ListView listView = (ListView) this.getActivity().findViewById(R.id.listViewSchedule);
         TaskAdapter taskAdapter = new TaskAdapter(mTasks);
         listView.setAdapter(taskAdapter);
-        handleNotification();
     }
 
     @Override
@@ -251,9 +264,22 @@ public class TodayFragment extends Fragment {
         Intent alarmIntent = new Intent(getActivity(), AlarmReceiver.class);
         alarmIntent.putExtra("taskH", taskTimePriorityH);
         alarmIntent.putExtra("taskHTitle", taskTimePriorityHTitle);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarmManager = (AlarmManager) this.getActivity().getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 3600000, pendingIntent);
+
+        DateFormat writeFormat = new SimpleDateFormat("HH");
+        int hours = Integer.parseInt(writeFormat.format(currentDate));
+
+        if (hours > 6) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, ++hours);
+            calendar.set(Calendar.MINUTE, 00);
+            calendar.set(Calendar.SECOND, 00);
+            Log.d(LOG_TAG, "Hours! " + hours);
+
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarmManager = (AlarmManager) this.getActivity().getSystemService(Context.ALARM_SERVICE);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 3600000, pendingIntent);
+        }
     }
+
 
 }

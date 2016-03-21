@@ -8,12 +8,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class CalendarFragment extends Fragment {
 
     private String yearCalendarView = "year";
     private String monthCalendarView = "month";
     private String dayOfMonthCalendarView = "day";
     private long date;
+
+    private Date currentDate = new Date();
+    private DateFormat dateFormat = new SimpleDateFormat("dd.M.yyyy");
 
 
     @Override
@@ -30,18 +38,22 @@ public class CalendarFragment extends Fragment {
         date = calendarView.getDate();
         calendarView.setShowWeekNumber(false);
         calendarView.setFirstDayOfWeek(2);
+
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 
             @Override
             public void onSelectedDayChange(CalendarView calendarView1, int year, int month, int dayOfMonth) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), AddTimetableOnDateActivity.class);
-                intent.putExtra(yearCalendarView, year);
-                intent.putExtra(monthCalendarView, month);
-                intent.putExtra(dayOfMonthCalendarView, dayOfMonth);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(currentDate.getTime());
                 if (calendarView.getDate() != date) {
+                    intent.putExtra(yearCalendarView, year);
+                    intent.putExtra(monthCalendarView, month);
+                    intent.putExtra(dayOfMonthCalendarView, dayOfMonth);
                     date = calendarView.getDate();
                     startActivity(intent);
                 }
+
             }
         });
 

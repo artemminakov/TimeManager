@@ -32,6 +32,7 @@ public class EditTaskActivity extends Activity {
     private String isExecutedTask;
     private String dateTimetable;
     private int taskPositionInTimetable;
+    private String editTaskTitle;
 
     private TaskDatabaseHelper taskDBHelper;
     private SQLiteDatabase tasksDB;
@@ -39,6 +40,8 @@ public class EditTaskActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        editTaskTitle = getIntent().getStringExtra(taskTitleName);
 
         taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
         tasksDB = taskDBHelper.getWritableDatabase();
@@ -78,7 +81,11 @@ public class EditTaskActivity extends Activity {
 
         Button changeButton = (Button) findViewById(R.id.change_task_EditTaskActivity);
         if (isExecutedTask != null) {
-            editButton.setText("Выполнить!");
+            if ((getIntent().getIntExtra(taskIsSolvedName, 1) != 0)){
+                editButton.setText("Не выполнено!");
+            }else {
+                editButton.setText("Выполнено!");
+            }
             changeButton.setVisibility(View.VISIBLE);
             priorityTV.setText("Приоритет - " + priority[selectonPrioritySpinner]);
 
@@ -115,12 +122,14 @@ public class EditTaskActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (dateTimetable != null) {
-                    String editTaskTitle = getIntent().getStringExtra(taskTitleName);
-                    TaskDatabaseHelper.queryEditSolveTask(dateTimetable, editTaskTitle, taskPositionInTimetable, tasksDB);
+                    if ((getIntent().getIntExtra(taskIsSolvedName, 1) != 0)){
+                        TaskDatabaseHelper.queryEditSolveTask(dateTimetable, editTaskTitle, taskPositionInTimetable, tasksDB, 0);
+                    }else {
+                        TaskDatabaseHelper.queryEditSolveTask(dateTimetable, editTaskTitle, taskPositionInTimetable, tasksDB, 1);
+                    }
                     finish();
                 } else {
                     isSolvedTask = checkBoxSolve.isChecked();
-                    String editTaskTitle = getIntent().getStringExtra(taskTitleName);
                     Task task = new Task();
                     task.setIsSolved(isSolvedTask);
                     task.setTitle(titleEditText.getText().toString());
@@ -143,6 +152,7 @@ public class EditTaskActivity extends Activity {
         dateTimetable = getIntent().getStringExtra(timetableDate);
         taskPositionInTimetable = getIntent().getIntExtra(taskPosition, 1) + 1;
         TaskDatabaseHelper.queryUpdateTask(dateTimetable, taskResId, taskPositionInTimetable, tasksDB);
+        TaskDatabaseHelper.queryEditSolveTask(dateTimetable, editTaskTitle, taskPositionInTimetable, tasksDB, 0);
         finish();
     }
 

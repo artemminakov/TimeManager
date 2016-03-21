@@ -18,6 +18,9 @@ public class AlarmReceiver extends BroadcastReceiver {
     private String[] taskPriorityH = new String[15];
     private String[] taskPriorityHTitle = new String[15];
     private String messageTitle;
+    private String taskTime;
+
+    private final String NOTIFICATIONEXTR = "Notification";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -29,7 +32,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         String str = new SimpleDateFormat("HH").format(Calendar.getInstance().getTime());
         if (taskPriorityH != null) {
             for (int i = 0; i < taskPriorityH.length; i++) {
-                String taskTime;
                 if (taskPriorityH[i] != null) {
                     taskTime = taskPriorityH[i];
                     if (taskPriorityHTitle[i] != null)
@@ -45,8 +47,10 @@ public class AlarmReceiver extends BroadcastReceiver {
                                     .setTicker(messageTitle)
                                     .setContentTitle(context.getResources().getString(R.string.message_box_title))
                                     .setContentText(messageTitle)
-                                    .setAutoCancel(true).setVibrate(vibrate);
+                                    .setAutoCancel(true)
+                                    .setVibrate(vibrate);
                     Intent resultIntent = new Intent(context, MainActivity.class);
+                    resultIntent.putExtra(NOTIFICATIONEXTR, "Notification");
                     TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
                     stackBuilder.addParentStack(MainActivity.class);
                     stackBuilder.addNextIntent(resultIntent);

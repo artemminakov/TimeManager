@@ -125,7 +125,7 @@
     <Button
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:text="Изменить"
+        android:text="Заменить задачу"
         android:id="@+id/change_task_EditTaskActivity"
         android:background="@color/backgroundMain"
         android:textColor="#fff"

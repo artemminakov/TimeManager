@@ -43,15 +43,16 @@ public class AddTaskActivity extends Activity {
                 taskPriority = priority[0];
             }
         });
+
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!titleEditText.getText().toString().matches("") &&
-                        !quantityHoursEditText.getText().toString().matches("")) {
+                if (!titleEditText.getText().toString().trim().matches("") &&
+                        quantityHoursEditText.getText().toString().matches("[-+]?\\d+")) {
                     Intent intent = new Intent();
                     Task task = new Task();
                     task.setPriority(taskPriority);
-                    task.setTitle(titleEditText.getText().toString());
+                    task.setTitle(titleEditText.getText().toString().trim());
                     task.setNumberOfHoursToSolve(Integer.parseInt(quantityHoursEditText.getText().toString()));
                     TaskDatabaseHelper.queryAddTaskToDatabase(task, taskDB);
                     setResult(RESULT_OK, intent);
