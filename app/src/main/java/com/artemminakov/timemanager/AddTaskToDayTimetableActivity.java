@@ -24,7 +24,7 @@ public class AddTaskToDayTimetableActivity extends Activity {
 
     private ArrayList<Task> mTasks;
 
-    private final String LOG_TAG = "AddTaskToDayTimetableActivity";
+    private final String LOG_TAG = "ATTDTA";
 
     private TaskDatabaseHelper taskDBHelper;
     private SQLiteDatabase taskDB;

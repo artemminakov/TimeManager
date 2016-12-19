@@ -60,7 +60,7 @@ public class MainActivity extends FragmentActivity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close ) {
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
             public void onDrawerClosed(View view) {
                 getActionBar().setTitle(title);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
@@ -92,7 +92,9 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
-    /* The click listner for ListView in the navigation drawer */
+
+/* The click listner for ListView in the navigation drawer */
+
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -124,10 +126,12 @@ public class MainActivity extends FragmentActivity {
         getActionBar().setTitle(this.title);
     }
 
+
     /**
      * When using the ActionBarDrawerToggle, you must call it during
      * onPostCreate() and onConfigurationChanged()...
      */
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -143,9 +147,11 @@ public class MainActivity extends FragmentActivity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+
     /**
      * Fragment that appears in the "content_frame", shows a planet
      */
+
     public static class ItemFragment extends Fragment {
         public static final String ARG_ITEM_NUMBER = "item_number";
 

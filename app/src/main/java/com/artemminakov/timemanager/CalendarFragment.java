@@ -3,15 +3,24 @@ package com.artemminakov.timemanager;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class CalendarFragment extends Fragment {
 
@@ -19,10 +28,15 @@ public class CalendarFragment extends Fragment {
     private String monthCalendarView = "month";
     private String dayOfMonthCalendarView = "day";
     private long date;
+    private static final String LOG_TAG = "TasksFragment";
 
     private Date currentDate = new Date();
-    private DateFormat dateFormat = new SimpleDateFormat("dd.M.yyyy");
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.schedule_menu, menu);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,6 +52,7 @@ public class CalendarFragment extends Fragment {
         date = calendarView.getDate();
         calendarView.setShowWeekNumber(false);
         calendarView.setFirstDayOfWeek(2);
+        setHasOptionsMenu(true);
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 

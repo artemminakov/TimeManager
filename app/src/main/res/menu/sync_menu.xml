@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/action_add_task"
-        android:icon="@drawable/add_button"
-        android:title="@string/new_task"
-        android:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/action_sync_task"
         android:icon="@drawable/syncpicture"
         android:title="Sync"

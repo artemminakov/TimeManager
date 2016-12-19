@@ -37,8 +37,10 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_TIMETABLESOLVE_DATE = "date";
 
     private static final String COLUMN_TIMETABLE_DATE = "date";
-    private static final String[] COLUMN_TIMETABLE_TASKS = {"taskId1", "taskId2", "taskId3", "taskId4", "taskId5", "taskId6", "taskId7",
-            "taskId8", "taskId9", "taskId10", "taskId11", "taskId12", "taskId13", "taskId14", "taskId15"};
+    private static final String[] COLUMN_TIMETABLE_TASKS = {"taskId1",
+            "taskId2", "taskId3", "taskId4", "taskId5", "taskId6",
+            "taskId7", "taskId8", "taskId9", "taskId10", "taskId11",
+            "taskId12", "taskId13", "taskId14", "taskId15"};
 
     private static final DateFormat format = new SimpleDateFormat("dd.M.yyyy");
 
@@ -254,7 +256,10 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public static void queryEditSolveTask(String dateTimetable, String editTaskTitle, int taskPositionInTimetable, SQLiteDatabase taskDB,
+    public static void queryEditSolveTask(String dateTimetable,
+                                          String editTaskTitle,
+                                          int taskPositionInTimetable,
+                                          SQLiteDatabase taskDB,
                                         int solve) {
 
         ContentValues taskCV = new ContentValues();

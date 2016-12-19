@@ -1,9 +1,7 @@
 package com.artemminakov.timemanager;
 
 import android.app.Fragment;
-import android.app.LoaderManager;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,8 +18,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.nio.charset.Charset;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class TasksFragment extends Fragment {
     private ArrayList<Task> mTasks;
@@ -66,17 +76,28 @@ public class TasksFragment extends Fragment {
         inflater.inflate(R.menu.task_menu, menu);
     }
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_task:
                 Intent intent = new Intent(getActivity().getApplicationContext(), AddTaskActivity.class);
                 startActivityForResult(intent, 0);
                 return true;
+            case R.id.action_sync_task:
+                Log.d(LOG_TAG, "Sync data!");
+                JSONParser jsonParser = new JSONParser();
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                try {
+                    JSONObject json = jsonParser.makeHttpRequest("http://192.168.0.100:8080/tasks/1", "GET", params);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //String json = readJsonFromUrl("http://localhost:8080/tasks");
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -92,7 +113,7 @@ public class TasksFragment extends Fragment {
         taskDB = taskDBHelper.getWritableDatabase();
         Log.d(LOG_TAG, "onCreateView!");
 
-        if (TaskDatabaseHelper.queryIsNotCreateTasks(taskDB)){
+        if (TaskDatabaseHelper.queryIsNotCreateTasks(taskDB)) {
             Task task = new Task(" ", "Средний", 5, false);
             TaskDatabaseHelper.queryAddTaskToDatabase(task, taskDB);
         }

@@ -1,15 +1,23 @@
 package com.artemminakov.timemanager;
 
+import android.accounts.AccountManager;
 import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,22 +26,39 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.calendar.CalendarScopes;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
+import pub.devrel.easypermissions.EasyPermissions;
+
+import static android.app.Activity.RESULT_OK;
 
 public class TodayFragment extends Fragment {
+
+    GoogleAccountCredential mCredential;
+
+    static final int REQUEST_ACCOUNT_PICKER = 1000;
+    static final int REQUEST_AUTHORIZATION = 1001;
+    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+
+    private static final String PREF_ACCOUNT_NAME = "accountName";
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR};
 
     private ArrayList<Task> mTasks;
     private TaskDatabaseHelper taskDBHelper;
     private SQLiteDatabase taskDB;
     private boolean[] tasksSolve = new boolean[15];
     private int positionInTaskSolve = 0;
-    private static final String[] taskTime = {"08", "09", "10", "11", "12", "13", "14", "15", "16", "17",
-            "18", "19", "20", "21", "22"};
+    private static final String[] taskTime = {"08", "09", "10", "11", "12",
+            "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"};
     private static String[] taskTimePriorityH = new String[15];
     private static String[] taskTimePriorityHTitle = new String[15];
     private int positionInTaskTimePriorityH = 0;
@@ -68,16 +93,20 @@ public class TodayFragment extends Fragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_today_task, null);
+                convertView = getActivity().getLayoutInflater()
+                        .inflate(R.layout.list_item_today_task, null);
             }
 
             Task task = getItem(position);
 
-            TextView titleTextView = (TextView) convertView.findViewById(R.id.today_task_list_item_titleTextView);
+            TextView titleTextView = (TextView) convertView.
+                    findViewById(R.id.today_task_list_item_titleTextView);
             titleTextView.setText(task.getTitle());
-            CheckBox solvedCheckBox = (CheckBox) convertView.findViewById(R.id.today_task_list_item_solvedCheckBox);
+            CheckBox solvedCheckBox = (CheckBox) convertView
+                    .findViewById(R.id.today_task_list_item_solvedCheckBox);
             solvedCheckBox.setChecked(tasksSolve[position]);
-            TextView timeTextView = (TextView) convertView.findViewById(R.id.today_task_list_item_timeTextView);
+            TextView timeTextView = (TextView) convertView
+                    .findViewById(R.id.today_task_list_item_timeTextView);
             timeTextView.setText(task.getTaskTime(position));
 
 
@@ -86,15 +115,19 @@ public class TodayFragment extends Fragment {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+
         Log.d(LOG_TAG, "onCreate!");
         taskDBHelper = new TaskDatabaseHelper(getActivity().getApplicationContext());
         taskDB = taskDBHelper.getWritableDatabase();
         TaskDatabaseHelper.addTimeteableToDatabase(dateFormat.format(currentDate), taskDB);
         queryTaskDBHelper(dateFormat.format(currentDate));
-        if (TaskDatabaseHelper.queryIsNotCreateTasks(taskDB)){
+        if (TaskDatabaseHelper.queryIsNotCreateTasks(taskDB)) {
             Task task = new Task(" ", "Средний", 5, false);
             TaskDatabaseHelper.queryAddTaskToDatabase(task, taskDB);
         }
@@ -104,6 +137,30 @@ public class TodayFragment extends Fragment {
 
         if (isNotification == null) {
             handleNotification();
+        }
+
+        // Initialize credentials and service object.
+        mCredential = GoogleAccountCredential.usingOAuth2(
+                this.getActivity().getApplicationContext(), Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.sync_menu, menu);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_sync_task:
+                GoogleCalendarApi.sendResultsToApi(this.getActivity(),
+                        this.getContext(), mCredential, mTasks, currentDate);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -123,15 +180,18 @@ public class TodayFragment extends Fragment {
                 taskPositionInTimetable = position + 1;
                 Intent intent;
                 if (task.getTitle().equals(" ")) {
-                    intent = new Intent(getActivity().getApplicationContext(), AddTaskToDayTimetableActivity.class);
+                    intent = new Intent(getActivity().getApplicationContext(),
+                            AddTaskToDayTimetableActivity.class);
                     Log.d(LOG_TAG, "Empty task -> AddTaskToDayTimetable.class");
                     startActivityForResult(intent, 1);
                 } else {
-                    intent = new Intent(getActivity().getApplicationContext(), EditTaskActivity.class);
+                    intent = new Intent(getActivity().getApplicationContext(),
+                            EditTaskActivity.class);
 
                     intent.putExtra(taskTitle, task.getTitle());
                     intent.putExtra(taskPriority, task.getPriority());
-                    intent.putExtra(taskQuantityHours, Integer.toString(task.getNumberOfHoursToSolve()));
+                    intent.putExtra(taskQuantityHours,
+                            Integer.toString(task.getNumberOfHoursToSolve()));
                     intent.putExtra(taskIsSolved, (tasksSolve[position] ? 1 : 0));
                     intent.putExtra(taskExecuted, "Executed");
                     intent.putExtra(timetableDate, dateFormat.format(currentDate));
@@ -169,21 +229,70 @@ public class TodayFragment extends Fragment {
         TaskDatabaseHelper.addTimeteableToDatabase(dateFormat.format(currentDate), taskDB);
         queryTaskDBHelper(dateFormat.format(currentDate));
         mTasks = DayTimetable.get(getActivity()).getTasks();
-        ListView listView = (ListView) this.getActivity().findViewById(R.id.listViewSchedule);
+        ListView listView = (ListView) this.getActivity()
+                .findViewById(R.id.listViewSchedule);
         TaskAdapter taskAdapter = new TaskAdapter(mTasks);
         listView.setAdapter(taskAdapter);
     }
 
+    /**
+     * Called when an activity launched here (specifically, AccountPicker
+     * and authorization) exits, giving you the requestCode you started it with,
+     * the resultCode it returned, and any additional data from it.
+     *
+     * @param requestCode code indicating which activity result is incoming.
+     * @param resultCode  code indicating the result of the incoming
+     *                    activity result.
+     * @param data        Intent (containing result data) returned by incoming
+     *                    activity result.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_GOOGLE_PLAY_SERVICES:
+                if (resultCode == RESULT_OK) {
+                    GoogleCalendarApi.sendResultsToApi(this.getActivity(),
+                            this.getContext(), mCredential, mTasks, currentDate);
+                }
+                break;
+            case REQUEST_ACCOUNT_PICKER:
+                if (resultCode == RESULT_OK && data != null &&
+                        data.getExtras() != null) {
+                    String accountName =
+                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        SharedPreferences settings =
+                                this.getActivity().getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(PREF_ACCOUNT_NAME, accountName);
+                        editor.apply();
+                        mCredential.setSelectedAccountName(accountName);
+
+                        GoogleCalendarApi.sendResultsToApi(this.getActivity(),
+                                this.getContext(), mCredential, mTasks, currentDate);
+                    }
+                }
+                break;
+            case REQUEST_AUTHORIZATION:
+                if (resultCode == RESULT_OK) {
+
+                    GoogleCalendarApi.sendResultsToApi(this.getActivity(),
+                            this.getContext(), mCredential, mTasks, currentDate);
+                }
+                break;
+        }
         if (data == null) {
             Log.d(LOG_TAG, "Empty activity result");
             return;
         }
         int taskResId;
         taskResId = data.getIntExtra("taskId", 1);
-        Log.d(LOG_TAG, "Full activity result -> " + dateFormat.format(currentDate) + ", " + taskResId);
-        TaskDatabaseHelper.queryUpdateTask(dateFormat.format(currentDate), taskResId, taskPositionInTimetable, taskDB);
+        Log.d(LOG_TAG, "Full activity result -> " + dateFormat
+                .format(currentDate) + ", " + taskResId);
+        TaskDatabaseHelper.queryUpdateTask(dateFormat
+                .format(currentDate), taskResId, taskPositionInTimetable, taskDB);
     }
 
     private void queryTaskDBHelper(String date) {
@@ -281,5 +390,26 @@ public class TodayFragment extends Fragment {
         }
     }
 
+
+    /**
+     * Respond to requests for permissions at runtime for API 23 and above.
+     *
+     * @param requestCode  The request code passed in
+     *                     requestPermissions(android.app.Activity, String, int, String[])
+     * @param permissions  The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *                     which is either PERMISSION_GRANTED or PERMISSION_DENIED. Never null.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        Log.d(LOG_TAG, "onRequestPermissionsResult(int requestCode,\n" +
+                " @NonNull String[] permissions,\n" +
+                " @NonNull int[] grantResults)");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(
+                requestCode, permissions, grantResults, this);
+    }
 
 }
