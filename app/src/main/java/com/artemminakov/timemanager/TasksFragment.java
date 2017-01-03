@@ -76,28 +76,17 @@ public class TasksFragment extends Fragment {
         inflater.inflate(R.menu.task_menu, menu);
     }
 
-    /*@Override
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_task:
                 Intent intent = new Intent(getActivity().getApplicationContext(), AddTaskActivity.class);
                 startActivityForResult(intent, 0);
                 return true;
-            case R.id.action_sync_task:
-                Log.d(LOG_TAG, "Sync data!");
-                JSONParser jsonParser = new JSONParser();
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
-                try {
-                    JSONObject json = jsonParser.makeHttpRequest("http://192.168.0.100:8080/tasks/1", "GET", params);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                //String json = readJsonFromUrl("http://localhost:8080/tasks");
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }*/
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

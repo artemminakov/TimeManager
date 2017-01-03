@@ -4,11 +4,13 @@ import android.accounts.AccountManager;
 import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,6 +32,18 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,7 +66,7 @@ public class TodayFragment extends Fragment {
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = {CalendarScopes.CALENDAR};
 
-    private ArrayList<Task> mTasks;
+    private ArrayList<Task> mTasks = new ArrayList<>(15);
     private TaskDatabaseHelper taskDBHelper;
     private SQLiteDatabase taskDB;
     private boolean[] tasksSolve = new boolean[15];
@@ -81,6 +95,8 @@ public class TodayFragment extends Fragment {
 
     private final String NOTIFICATIONEXTR = "Notification";
     private String isNotification = "";
+
+    ProgressDialog mProgress;
 
     private DateFormat dateFormat = new SimpleDateFormat("dd.M.yyyy");
     private Date currentDate = new Date();
@@ -222,17 +238,22 @@ public class TodayFragment extends Fragment {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
+    //FIX this
     public void onResume() {
         super.onResume();
         Log.d(LOG_TAG, "onResume!");
         TaskDatabaseHelper.addTimeteableToDatabase(dateFormat.format(currentDate), taskDB);
         queryTaskDBHelper(dateFormat.format(currentDate));
         mTasks = DayTimetable.get(getActivity()).getTasks();
-        ListView listView = (ListView) this.getActivity()
-                .findViewById(R.id.listViewSchedule);
-        TaskAdapter taskAdapter = new TaskAdapter(mTasks);
-        listView.setAdapter(taskAdapter);
+        mProgress = new ProgressDialog(this.getActivity());
+        mProgress.setMessage("Sync with cist.nure");
+        new NureAsyncTask().execute();
+        int counter = 0;
+        for (Task t : mTasks) {
+            Log.d(LOG_TAG, t.toString() + " " + counter++);
+        }
     }
 
     /**
@@ -410,6 +431,149 @@ public class TodayFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(
                 requestCode, permissions, grantResults, this);
+    }
+
+    class NureAsyncTask extends AsyncTask<Void, Void, Void> {
+
+
+        private final String LOG_TAG = "NureAsyncTask";
+
+        private final int[] taskTime = {8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+                22, 23};
+
+        private ArrayList<String> tasks = new ArrayList<>();
+
+        @RequiresApi(api = Build.VERSION_CODES.M)
+        NureAsyncTask() {
+            Log.d(LOG_TAG, "MakeRequestTask(GoogleAccountCredential credential)");
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Log.d(LOG_TAG, "doInBackground(Void... params)");
+            try {
+                return getDataFromApi();
+            } catch (Exception e) {
+                cancel(true);
+                return null;
+            }
+        }
+
+        private Void getDataFromApi() throws IOException {
+            Log.d(LOG_TAG, "getDataFromApi()");
+            JSONObject json = null;
+            Log.d(LOG_TAG, "before");
+            for (Task t : mTasks) {
+                Log.d(LOG_TAG, t.toString());
+            }
+            Log.d(LOG_TAG, "after\n\n\n\n\n\n\n\n");
+            try {
+                json = readJsonFromUrl("http://cist.nure.ua/ias/app/tt/P_API_EVENTS_GROUP_JSON?" +
+                        "p_id_group=4307198&time_from=1483101900&time_to=1484563900");
+
+                JSONArray arr = json.getJSONArray("events");
+
+                for (int i = 0; i < arr.length(); i++) {
+                    int subject_id = arr.getJSONObject(i).getInt("subject_id");
+                    Calendar curCal = Calendar.getInstance();
+                    curCal.setTime(currentDate);
+
+                    Date start_time = new Date(arr.getJSONObject(i).getInt("start_time") * 1000L);
+                    Calendar startCal = Calendar.getInstance();
+                    startCal.setTime(start_time);
+                    Date end_time = new Date(arr.getJSONObject(i).getInt("end_time") * 1000L);
+                    Calendar endCal = Calendar.getInstance();
+                    endCal.setTime(end_time);
+                    if (startCal.get(Calendar.MONTH) == curCal.get(Calendar.MONTH)
+                            && startCal.get(Calendar.DAY_OF_MONTH) == curCal.get(Calendar.DAY_OF_MONTH)) {
+//                        Log.d(LOG_TAG, "" + curCal.get(Calendar.MONTH) + " " + curCal.get(Calendar.DAY_OF_MONTH) +
+//                                " " + startCal.get(Calendar.MONTH) + " " + startCal.get(Calendar.DAY_OF_MONTH));
+                        for (int j = 0; j < taskTime.length; j++) {
+                            if (taskTime[j] >= startCal.get(Calendar.HOUR)
+                                    && taskTime[j] <= endCal.get(Calendar.HOUR)) {
+                                mTasks.set(j, new Task("Пара", "Высокий", 1, false));
+                                Log.d(LOG_TAG, "" + subject_id + " " + currentDate + " " + start_time + " " + end_time);
+                                continue;
+                            } else {
+                                /*mTasks.add(new Task(" ", "J,sxysq", 1, false));*/
+                            }
+                        }
+                    }
+                    int type = arr.getJSONObject(i).getInt("type");
+                    int number_pair = arr.getJSONObject(i).getInt("number_pair");
+                    String auditory = arr.getJSONObject(i).getString("auditory");
+//            String teachers = arr.getJSONObject(i).getString("teachers");
+                    /*Log.d(LOG_TAG, subject_id + " " + start_time + " " +
+                            end_time + " " + type + " " + number_pair + " " + auditory);*/
+                /*System.out.println(subject_id + " " + start_time + " " + end_time + " " + type + " " + number_pair + " "
+                        + auditory + " " *//*+ teachers*//*);*/
+                }
+                int counter = 0;
+                for (Task t : mTasks) {
+                    Log.d(LOG_TAG, t.toString() + " " + counter++);
+                }
+                //System.out.println(json.toString());
+                Timestamp stamp = new Timestamp(System.currentTimeMillis());
+                Date date = new Date(1483508700000L);
+//        Date date = new Date(stamp.getTime());
+//            System.out.println(date);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
+        @RequiresApi(api = Build.VERSION_CODES.M)
+        @Override
+        protected void onPreExecute() {
+            mProgress.show();
+            Log.d(LOG_TAG, "onPreExecute()");
+        }
+
+        @Override
+        protected void onPostExecute(Void value) {
+            Log.d(LOG_TAG, "onPostExecute()");
+            ListView listView = (ListView) TodayFragment.this.getActivity()
+                    .findViewById(R.id.listViewSchedule);
+            TaskAdapter taskAdapter = new TaskAdapter(mTasks);
+            listView.setAdapter(taskAdapter);
+            mProgress.hide();
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.M)
+        @Override
+        protected void onCancelled() {
+            Log.d(LOG_TAG, "onCancelled()");
+            mProgress.hide();
+
+        }
+
+        public JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
+            InputStream is = new URL(url).openStream();
+            try {
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is,
+                        Charset.forName("windows-1251")));
+                String jsonText = readAll(rd);
+//            String jsonText = object;
+                //System.out.println(jsonText);
+                JSONObject json = new JSONObject(jsonText);
+                return json;
+            } finally {
+                is.close();
+            }
+        }
+
+        private String readAll(Reader rd) throws IOException {
+            StringBuilder sb = new StringBuilder();
+            int cp;
+            while ((cp = rd.read()) != -1) {
+                sb.append((char) cp);
+            }
+            return sb.toString();
+        }
+
     }
 
 }

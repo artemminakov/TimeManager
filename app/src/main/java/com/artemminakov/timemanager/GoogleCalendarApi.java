@@ -13,12 +13,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.client.util.StreamingContent;
-import com.google.api.services.calendar.CalendarScopes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
