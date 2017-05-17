@@ -2,7 +2,6 @@ package com.artemminakov.timemanager;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -27,7 +26,6 @@ public class AddTaskToDayTimetableActivity extends Activity {
     private final String LOG_TAG = "ATTDTA";
 
     private TaskDatabaseHelper taskDBHelper;
-    private SQLiteDatabase taskDB;
 
 
     public class TaskAdapter extends ArrayAdapter<Task> {
@@ -44,9 +42,11 @@ public class AddTaskToDayTimetableActivity extends Activity {
             Task task = getItem(position);
 
 
-            TextView titleTextView = (TextView) convertView.findViewById(R.id.task_list_item_titleTextView);
+            TextView titleTextView = (TextView) convertView
+                    .findViewById(R.id.task_list_item_titleTextView);
             titleTextView.setText(task.getTitle());
-            CheckBox solvedCheckBox = (CheckBox) convertView.findViewById(R.id.task_list_item_solvedCheckBox);
+            CheckBox solvedCheckBox = (CheckBox) convertView
+                    .findViewById(R.id.task_list_item_solvedCheckBox);
             solvedCheckBox.setChecked(task.isSolved());
 
             return convertView;
@@ -79,11 +79,10 @@ public class AddTaskToDayTimetableActivity extends Activity {
         super.onCreate(savedInstanceState);
         //getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.add_task_to_day_timetable_activity);
-        mTasks = TaskLab.get(this).getTasks();
+        mTasks = TaskLab.get().getTasks();
         final ListView listVievTasks = (ListView) findViewById(R.id.listViewTasks_AddToDay);
         Log.d(LOG_TAG, "In AddTaskToDayTimetable.class");
-        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
-        taskDB = taskDBHelper.getWritableDatabase();
+        taskDBHelper = TaskDatabaseHelper.getTaskDatabaseHelper();
 
         listVievTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -93,7 +92,7 @@ public class AddTaskToDayTimetableActivity extends Activity {
                 StringBuilder taskPosition = new StringBuilder();
                 taskPosition.append(position + 2);
                 Log.d(LOG_TAG, "Task position " + taskPosition.toString());
-                intent.putExtra("taskId", TaskDatabaseHelper.queryTaskId(task.getTitle(), taskDB));
+                intent.putExtra("taskId", taskDBHelper.queryGetTaskId(task.getTitle()));
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -104,7 +103,7 @@ public class AddTaskToDayTimetableActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
-        TaskDatabaseHelper.queryGetTasks(taskDB, getApplicationContext());
+        taskDBHelper.queryGetTasks();
         ListView listViewTasks = (ListView) findViewById(R.id.listViewTasks_AddToDay);
         Collections.reverse(mTasks);
         TaskAdapter taskAdapter = new TaskAdapter(mTasks);
@@ -112,15 +111,16 @@ public class AddTaskToDayTimetableActivity extends Activity {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        TaskLab.get(this).clear();
+    public void onPause() {
+        super.onPause();
+        TaskLab.get().clear();
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        TaskLab.get(this).clear();
+    public void onDestroy() {
+        super.onDestroy();
+        TaskLab.get().clear();
+        taskDBHelper.close();
     }
 
 }

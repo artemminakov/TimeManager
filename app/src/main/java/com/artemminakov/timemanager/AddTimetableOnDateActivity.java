@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -56,8 +55,9 @@ public class AddTimetableOnDateActivity extends Activity {
     private int dayOfMonth;
 
     private ArrayList<Task> mTasks;
+
     private TaskDatabaseHelper taskDBHelper;
-    private SQLiteDatabase taskDB;
+
     private final String LOG_TAG = "AddTimetableOnDate";
     private int taskPositionInTimetable;
 
@@ -103,8 +103,7 @@ public class AddTimetableOnDateActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
-        taskDB = taskDBHelper.getWritableDatabase();
+        taskDBHelper = TaskDatabaseHelper.getTaskDatabaseHelper();
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "onCreate()");
         setContentView(R.layout.add_timetable_on_data_activity);
@@ -123,7 +122,7 @@ public class AddTimetableOnDateActivity extends Activity {
             dateTimetableTitle.append(0);
         }
         dateTimetable.append(month + 1).append(".").append(year);
-        TaskDatabaseHelper.addTimeteableToDatabase(dateTimetable.toString(), taskDB);
+        taskDBHelper.addTodayTimetable(dateTimetable.toString());
         dateTimetableTitle.append(month + 1).append(".").append(year);
         TextView titleTextView = (TextView) findViewById(R.id.textViewHeaderAddTimetableOnData);
         StringBuilder title = new StringBuilder();
@@ -131,7 +130,7 @@ public class AddTimetableOnDateActivity extends Activity {
         titleTextView.setText(title);
 
         final ListView lvMain = (ListView) findViewById(R.id.listViewTasksAddTimetableOnData);
-        mTasks = DayTimetable.get(this).getTasks();
+        mTasks = DayTimetable.get().getTasks();
 
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -243,15 +242,25 @@ public class AddTimetableOnDateActivity extends Activity {
         int taskResId;
         taskResId = data.getIntExtra("taskId", 1);
         Log.d(LOG_TAG, "Full activity result -> " + dateTimetable.toString() + ", " + taskResId);
-        TaskDatabaseHelper.queryUpdateTask(dateTimetable.toString(), taskResId,
-                taskPositionInTimetable, taskDB);
+        taskDBHelper.queryUpdateTask(dateTimetable.toString(), taskResId,
+                taskPositionInTimetable);
         return;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(LOG_TAG, "onResume()");
+        tasksSolve = taskDBHelper.queryGetTimetableOnDate(dateTimetable.toString());
+        ListView listView = (ListView) findViewById(R.id.listViewTasksAddTimetableOnData);
+        TaskAdapter adapter = new TaskAdapter(mTasks);
+        listView.setAdapter(adapter);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        DayTimetable.get(getApplicationContext()).clear();
+        DayTimetable.get().clear();
         Log.d(LOG_TAG, "onPause()");
     }
 
@@ -259,18 +268,8 @@ public class AddTimetableOnDateActivity extends Activity {
     public void onDestroy() {
         super.onDestroy();
         Log.d(LOG_TAG, "onDestroy()");
-        DayTimetable.get(getApplicationContext()).clear();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "onResume()");
-        tasksSolve = TaskDatabaseHelper.queryGetOnDateTimetable(dateTimetable.toString(),
-                taskDB, getApplicationContext());
-        ListView listView = (ListView) findViewById(R.id.listViewTasksAddTimetableOnData);
-        TaskAdapter adapter = new TaskAdapter(mTasks);
-        listView.setAdapter(adapter);
+        DayTimetable.get().clear();
+        taskDBHelper.close();
     }
 
 }

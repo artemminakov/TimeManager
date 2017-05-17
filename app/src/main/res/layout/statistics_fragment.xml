@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewStatisticsFragmentHeader"
-        android:text="Статистика"
+        android:text="@string/textViewStatisticsFragmentHeader"
         android:textSize="30dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
@@ -40,7 +40,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text=""
         android:id="@+id/textViewStatisticsFragmentExecutionTasksCount"
         android:textSize="25dp"
         android:paddingLeft="130dp"/>

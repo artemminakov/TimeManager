@@ -3,6 +3,7 @@ package com.artemminakov.timemanager;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -22,6 +23,7 @@ public class MainActivity extends FragmentActivity {
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle mDrawerToggle;
+    private static Context context;
 
     private CharSequence drawerTitle;
     private CharSequence title;
@@ -38,6 +40,7 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity.context = getApplicationContext();
         setContentView(R.layout.activity_main);
 
         title = drawerTitle = getTitle();
@@ -52,7 +55,7 @@ public class MainActivity extends FragmentActivity {
 
         drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
-        drawerList.setAdapter(new ArrayAdapter<String>(this,
+        drawerList.setAdapter(new ArrayAdapter<>(this,
                 R.layout.drawer_list_item, itemTitles));
 
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
@@ -60,7 +63,8 @@ public class MainActivity extends FragmentActivity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer,
+                R.string.drawer_open, R.string.drawer_close) {
             public void onDrawerClosed(View view) {
                 getActionBar().setTitle(title);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
@@ -145,6 +149,10 @@ public class MainActivity extends FragmentActivity {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    public static Context getAppContext() {
+        return MainActivity.context;
     }
 
 

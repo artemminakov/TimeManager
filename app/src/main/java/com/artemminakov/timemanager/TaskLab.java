@@ -1,7 +1,5 @@
 package com.artemminakov.timemanager;
 
-import android.content.Context;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
@@ -11,16 +9,14 @@ public class TaskLab {
     private ArrayList<Task> mTasks;
 
     private static TaskLab sTaskLab;
-    private Context mAppContext;
 
-    private TaskLab(Context appContext) {
-        mAppContext = appContext;
-        mTasks = new ArrayList<Task>();
+    private TaskLab() {
+        mTasks = new ArrayList<>();
     }
 
-    public static TaskLab get(Context c) {
+    public static TaskLab get() {
         if (sTaskLab == null) {
-            sTaskLab = new TaskLab(c.getApplicationContext());
+            sTaskLab = new TaskLab();
         }
         return sTaskLab;
     }

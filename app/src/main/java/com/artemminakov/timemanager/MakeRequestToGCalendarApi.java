@@ -82,7 +82,7 @@ public class MakeRequestToGCalendarApi extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... params) {
         Log.d(LOG_TAG, "doInBackground(Void... params)");
         try {
-            return getDataFromApi();
+            return sendDataToApi();
         } catch (Exception e) {
             mLastError = e;
             cancel(true);
@@ -96,8 +96,8 @@ public class MakeRequestToGCalendarApi extends AsyncTask<Void, Void, Void> {
      * @return List of Strings describing returned events.
      * @throws IOException
      */
-    private Void getDataFromApi() throws IOException {
-        Log.d(LOG_TAG, "getDataFromApi()");
+    private Void sendDataToApi() throws IOException {
+        Log.d(LOG_TAG, "sendDataToApi()");
 
         EventAttendee[] attendees = new EventAttendee[]{
                 new EventAttendee().setEmail("frozermag@gmail.com"),
@@ -116,7 +116,7 @@ public class MakeRequestToGCalendarApi extends AsyncTask<Void, Void, Void> {
                 Event event = new Event()
                         .setSummary(task.toString());
 
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-M-dd");
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Log.d(LOG_TAG, dateFormat.format(date));
 
                 DateTime startDateTime = new DateTime(dateFormat.format(date)

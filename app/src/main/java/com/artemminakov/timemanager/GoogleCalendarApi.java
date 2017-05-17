@@ -45,11 +45,11 @@ public class GoogleCalendarApi {
                                         GoogleAccountCredential mCredential,
                                         ArrayList<Task> tasks,
                                         Date date) {
-        if (! isGooglePlayServicesAvailable(context)) {
+        if (!isGooglePlayServicesAvailable(context)) {
             acquireGooglePlayServices(activity, context);
         } else if (mCredential.getSelectedAccountName() == null) {
             chooseAccount(activity, context, mCredential, tasks, date);
-        } else if (! isDeviceOnline(activity)) {
+        } else if (!isDeviceOnline(activity)) {
             Toast toast = Toast.makeText(activity.getApplicationContext(),
                     "No network connection available.", Toast.LENGTH_SHORT);
             toast.show();
@@ -117,6 +117,7 @@ public class GoogleCalendarApi {
 
     /**
      * Checks whether the device currently has a network connection.
+     *
      * @return true if the device has a network connection, false otherwise.
      */
     private static boolean isDeviceOnline(Activity activity) {
@@ -129,8 +130,9 @@ public class GoogleCalendarApi {
 
     /**
      * Check that Google Play services APK is installed and up to date.
+     *
      * @return true if Google Play Services is available and up to
-     *     date on this device; false otherwise.
+     * date on this device; false otherwise.
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     private static boolean isGooglePlayServicesAvailable(Context context) {
@@ -144,8 +146,9 @@ public class GoogleCalendarApi {
     /**
      * Display an error dialog showing that Google Play Services is missing
      * or out of date.
+     *
      * @param connectionStatusCode code describing the presence (or lack of)
-     *     Google Play Services on this device.
+     *                             Google Play Services on this device.
      */
     public static void showGooglePlayServicesAvailabilityErrorDialog(
             final int connectionStatusCode, Activity activity) {

@@ -18,7 +18,6 @@ public class AddTaskActivity extends Activity {
     private String taskPriority;
 
     private TaskDatabaseHelper taskDBHelper;
-    private SQLiteDatabase taskDB;
 
 
     @Override
@@ -28,10 +27,10 @@ public class AddTaskActivity extends Activity {
         setContentView(R.layout.add_task_activity);
         Button addButton = (Button) findViewById(R.id.add_btn_task_AddTaskActivity);
         final EditText titleEditText = (EditText) findViewById(R.id.title_AddTaskActivity);
-        final EditText quantityHoursEditText = (EditText) findViewById(R.id.quantH_editText_AddTaskActivity);
+        final EditText quantityHoursEditText = (EditText)
+                findViewById(R.id.quantH_editText_AddTaskActivity);
         Spinner prioritySpinner = (Spinner) findViewById(R.id.spinner_AddTaskActivity);
-        taskDBHelper = new TaskDatabaseHelper(getApplicationContext());
-        taskDB = taskDBHelper.getWritableDatabase();
+        taskDBHelper = TaskDatabaseHelper.getTaskDatabaseHelper();
         prioritySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -53,12 +52,19 @@ public class AddTaskActivity extends Activity {
                     Task task = new Task();
                     task.setPriority(taskPriority);
                     task.setTitle(titleEditText.getText().toString().trim());
-                    task.setNumberOfHoursToSolve(Integer.parseInt(quantityHoursEditText.getText().toString()));
-                    TaskDatabaseHelper.queryAddTaskToDatabase(task, taskDB);
+                    task.setNumberOfHoursToSolve(Integer
+                            .parseInt(quantityHoursEditText.getText().toString()));
+                    taskDBHelper.queryAddTaskToDatabase(task);
                     setResult(RESULT_OK, intent);
                     finish();
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        taskDBHelper.close();
+        super.onDestroy();
     }
 }

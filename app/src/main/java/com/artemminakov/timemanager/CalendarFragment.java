@@ -33,12 +33,6 @@ public class CalendarFragment extends Fragment {
     private Date currentDate = new Date();
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.schedule_menu, menu);
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
@@ -48,7 +42,8 @@ public class CalendarFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.calendar_fragment, null);
-        final CalendarView calendarView = (CalendarView) view.findViewById(R.id.calendarFragment_calendarView);
+        final CalendarView calendarView = (CalendarView)
+                view.findViewById(R.id.calendarFragment_calendarView);
         date = calendarView.getDate();
         calendarView.setShowWeekNumber(false);
         calendarView.setFirstDayOfWeek(2);
@@ -57,8 +52,10 @@ public class CalendarFragment extends Fragment {
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 
             @Override
-            public void onSelectedDayChange(CalendarView calendarView1, int year, int month, int dayOfMonth) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), AddTimetableOnDateActivity.class);
+            public void onSelectedDayChange(CalendarView calendarView1, int year,
+                                            int month, int dayOfMonth) {
+                Intent intent = new Intent(getActivity().getApplicationContext(),
+                        AddTimetableOnDateActivity.class);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(currentDate.getTime());
                 if (calendarView.getDate() != date) {

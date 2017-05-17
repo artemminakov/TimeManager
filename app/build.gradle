@@ -7,7 +7,7 @@ android {
         applicationId "com.artemminakov.timemanager"
         minSdkVersion 17
         targetSdkVersion 22
-        versionCode 2
+        versionCode 4
         versionName "1.0"
     }
     buildTypes {

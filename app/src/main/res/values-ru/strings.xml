@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TimeManager</string>
+    <string name="tasks_title">Задания</string>
+    <string name="action_settings">Настройки</string>
+    <string name="delete_task">Удалить</string>
+    <string name="message_box_title">Важная задача</string>
+    <string name="message_timesheet_not_up_to_date"></string>
+    <string-array name="menu_items_array">
+        <item>Сегодня</item>
+        <item>Календарь</item>
+        <item>Задачи</item>
+        <item>Статистика</item>
+    </string-array>
+    <string-array name="items_priority">
+        <item>Низкий</item>
+        <item>Средний</item>
+        <item>Высокий</item>
+    </string-array>
+    /string-array>
+    <string-array name="items_statistics">
+        <item>Сегодня</item>
+        <item>За неделю</item>
+        <item>За месяц</item>
+    </string-array>
+
+    <string name="new_task">Добавить</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <string name="taskTitle_editText">Название</string>
+    <string name="taskQuantH_editText">Количество часов</string>
+    <string name="taskPriority_textView">Приоритет</string>
+
+    <!--add_task_activity-->
+
+    <string name="add_btn_task_AddTaskActivity">Добавить</string>
+
+    <!--add_task_to_day_timetable_activity-->
+
+    <string name="textViewTasksFragmentHeader_AddToDay">Задачи</string>
+
+    <!--edit_task_activity-->
+
+    <string name="edit_btn_task_EditTaskActivity">Редактировать</string>
+    <string name="checkboxTitle_textView_EditTaskActivity">Сделано</string>
+    <string name="change_task_EditTaskActivity">Заменить задачу</string>
+
+
+    <!--statistics_fragment-->
+
+    <string name="textViewStatisticsFragmentHeader">Статистика</string>
+    <string name="current_task">Текущие:</string>
+    <string name="execute_task">Выполнено:</string>
+    <string name="overdue_task">Не выполнены:</string>
+
+    <!--tasks_fragment-->
+
+    <string name="textViewTasksFragmentHeader">Задачи</string>
+
+    <!--today_fragment-->
+
+    <string name="textViewTodayFragmentHeader">Сегодня</string>
+
+</resources>

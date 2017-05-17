@@ -9,7 +9,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewHeaderAddTimetableOnData"
-        android:text="Расписание на 15.05.2015"
         android:textSize="24dp"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="10dp"

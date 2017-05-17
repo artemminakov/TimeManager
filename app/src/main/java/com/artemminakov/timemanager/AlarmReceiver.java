@@ -43,7 +43,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                     NotificationCompat.Builder mBuilder =
                             new NotificationCompat.Builder(context)
                                     .setSmallIcon(R.drawable.ic_launcher)
-                                    .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.ic_launcher))
+                                    .setLargeIcon(BitmapFactory
+                                            .decodeResource(res, R.drawable.ic_launcher))
                                     .setTicker(messageTitle)
                                     .setContentTitle(context.getResources().getString(R.string.message_box_title))
                                     .setContentText(messageTitle)
@@ -54,9 +55,11 @@ public class AlarmReceiver extends BroadcastReceiver {
                     TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
                     stackBuilder.addParentStack(MainActivity.class);
                     stackBuilder.addNextIntent(resultIntent);
-                    PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent resultPendingIntent = stackBuilder
+                            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                     mBuilder.setContentIntent(resultPendingIntent);
-                    NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    NotificationManager mNotificationManager = (NotificationManager)
+                            context.getSystemService(Context.NOTIFICATION_SERVICE);
                     mNotificationManager.notify(1, mBuilder.build());
                 }
             }

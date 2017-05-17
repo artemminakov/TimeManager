@@ -1,8 +1,6 @@
 package com.artemminakov.timemanager;
 
 
-import android.content.Context;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
@@ -11,19 +9,17 @@ public class DayTimetable {
     private ArrayList<Task> mTasks;
 
     private static DayTimetable sDayTimetable;
-    private Context mAppContext;
     private Date mDate;
 
-    private DayTimetable(Context appContext) {
-        mAppContext = appContext;
-        mTasks = new ArrayList<Task>();
+    private DayTimetable() {
+        mTasks = new ArrayList<>();
         mDate = new Date();
 
     }
 
-    public static DayTimetable get(Context c) {
+    public static DayTimetable get() {
         if (sDayTimetable == null) {
-            sDayTimetable = new DayTimetable(c.getApplicationContext());
+            sDayTimetable = new DayTimetable();
         }
         return sDayTimetable;
     }
